@@ -11,7 +11,7 @@ MILRatingCollectionView is an easy to use, drop-in, reusable UI component built 
 Simple copy `MILRatingCollectionView.swift` into your Xcode project.
 
 
-### Usage
+## Usage
 
 Open `ViewControllerExample.swift` to see an example in context.
 
