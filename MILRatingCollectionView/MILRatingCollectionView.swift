@@ -59,8 +59,8 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
     }
     
     // Init method called programmaticly
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    convenience init(frame: CGRect) {
+        self.init(frame: frame)
         initView()
     }
 
@@ -68,7 +68,6 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         initView()
-
     }
     
     /**
@@ -148,7 +147,7 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
         var visible = self.indexPathsForVisibleItems()
         
         for paths in visible {
-            var layoutAttributes = self.layoutAttributesForItemAtIndexPath(paths as NSIndexPath)
+            var layoutAttributes = self.layoutAttributesForItemAtIndexPath(paths as! NSIndexPath)
             
             // true when center point is within a cell's frame
             if CGRectContainsPoint(layoutAttributes!.frame, point) {
@@ -181,7 +180,7 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
                 }
                 
                 // make current center cell a highlighted cell
-                var cell = self.cellForItemAtIndexPath(attributes.indexPath) as RatingCollectionViewCell
+                var cell = self.cellForItemAtIndexPath(attributes.indexPath) as! RatingCollectionViewCell
                 cell.setAsHighlightedCell()
                 selectedIndexPath = attributes.indexPath
                 
@@ -324,7 +323,7 @@ class UICollectionViewFlowLayoutCenterItem: UICollectionViewFlowLayout {
         
         var width = self.collectionView!.bounds.size.width
         var proposedContentOffsetCenterX = proposedContentOffset.x + width * CGFloat(0.5)
-        var proposedRect = self.layoutAttributesForElementsInRect(self.collectionView!.bounds) as [UICollectionViewLayoutAttributes]
+        var proposedRect = self.layoutAttributesForElementsInRect(self.collectionView!.bounds) as! [UICollectionViewLayoutAttributes]
         
         var candidateAttributes: UICollectionViewLayoutAttributes?
         for attributes in proposedRect {
