@@ -6,32 +6,21 @@ Licensed Materials - Property of IBM
 import UIKit
 import QuartzCore
 
-/// Add 1 for the minimum number displayed (i.e. 0 will show 1 as the leftmost number in the range)
-let defaultMinRange = 0
-/// Subtract 1 for the minimum number displayed (i.e. 11 will show 10 as the rightmost number in the range)
-let defaultMaxRange = 11
-
-/// Even values will show one less cell on startup, due to the view being centered on an initial value
-let numCellsVisible: CGFloat = 5
-
-/// The minimum number of pixels each cell should be. Does not usually need be changed. Only takes effect when the numCellsVisible is set to a value that leaves little room for each cell.
-let minCellWidth: CGFloat = 35
-/// The size of the circle relative to the size of the cell
-let circleDiameterToCellWidthRatio: CGFloat = 2.0
-
-/// Font face to use for each item in the range
-let selectedFont = "Helvetica"
-/// The font color for each unselected item in the range
-let normalFontColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0)
-/// The font color for the selected item in the range
-let highlightedFontColor = UIColor.whiteColor()
-/// The background color of the circle that surrounds the selected item
-let circleBackgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
-
 /**
 Reusable CollectionView that acts as a horizontal scrolling number picker
 */
 class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICollectionViewDataSource, UIScrollViewDelegate {
+
+    /// Number of cells visible at a time in the view. Even values will show one less cell than selected on startup, due to the view being centered on an initial value
+    let numCellsVisible: CGFloat = 5
+    
+    /// The minimum number of pixels each cell should be. Does not usually need be changed. Only takes effect when the numCellsVisible is set to a value that leaves little room for each cell.
+    let minCellWidth: CGFloat = 35
+    /// The size of the circle relative to the size of the cell
+    let circleDiameterToCellWidthRatio: CGFloat = 2.0
+    
+    /// The background color of the circle that surrounds the selected item
+    let circleBackgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
     
     var dummyBackgroundView: UIView!
     var circularView: UIView!
@@ -46,7 +35,7 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
         }
     }
 
-    private var currentNumberRange: NSRange = NSMakeRange(defaultMinRange,defaultMaxRange)
+    private var currentNumberRange: NSRange = NSMakeRange(0,11)
     /// The range of the collectionView, location is the starting number, length is the number of elements
     var numberRange: NSRange {
         set(value) {
@@ -258,7 +247,13 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
 CollectionViewCell consisting of a number label that varies in size if it is the most centered cell
 */
 class RatingCollectionViewCell: UICollectionViewCell {
-    
+    /// Font face to use for each item in the range
+    let selectedFont = "Helvetica"
+    /// The font color for each unselected item in the range
+    let normalFontColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0)
+    /// The font color for the selected item in the range
+    let highlightedFontColor = UIColor.whiteColor()
+
     var numberLabel: UILabel!
     
     /**
