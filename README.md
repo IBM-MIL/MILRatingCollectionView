@@ -25,7 +25,7 @@ Open `ViewControllerExample.swift` to see an example in context.
 
         milRatingCollectionView.numberRange = NSMakeRange(1, 11) // 1 to 10 range
 The default range is 0 to 10 if `numberRange` isn't set.
-1. If desired, you can change the font name from Helvetica to whatever you like, assuming there is a Medium and Bold version of that font. You can change the font at the top of `MILRatingCollectionView.swift`,
+1. If desired, you can change the font name from Helvetica to whatever you like, assuming there is a Medium and Bold version of that font. You can change the font at line 251 of `MILRatingCollectionView.swift`,
         
         let selectedFont = "Helvetica"
 
