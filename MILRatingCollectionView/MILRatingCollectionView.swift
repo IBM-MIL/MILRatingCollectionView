@@ -6,20 +6,36 @@ Licensed Materials - Property of IBM
 import UIKit
 import QuartzCore
 
-let selectedFont = "Helvetica"
-
 /**
 Reusable CollectionView that acts as a horizontal scrolling number picker
 */
 class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICollectionViewDataSource, UIScrollViewDelegate {
 
+    /// Number of cells visible at a time in the view. Even values will show one less cell than selected on startup, due to the view being centered on an initial value
+    let numCellsVisible: CGFloat = 5
+    
+    /// The minimum number of pixels each cell should be. Does not usually need be changed. Only takes effect when the numCellsVisible is set to a value that leaves little room for each cell.
+    let minCellWidth: CGFloat = 35
+    /// The size of the circle relative to the size of the cell
+    let circleDiameterToCellWidthRatio: CGFloat = 2.0
+    
+    /// The background color of the circle that surrounds the selected item
+    let circleBackgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
+    
     var dummyBackgroundView: UIView!
     var circularView: UIView!
     var selectedIndexPath: NSIndexPath?
     var ratingCellID = "ratingCell"
     var centerIsSet = false
     
-    private var currentNumberRange: NSRange = NSMakeRange(0, 11)
+    /// The width of each individual cell which is computed by dividing the width of the view by the number of cells desired to be visible. The minimum cell width is used if the computed value is less than it.
+    var cellWidth: CGFloat {
+        get {
+            return max(minCellWidth,frame.size.width/numCellsVisible)
+        }
+    }
+
+    private var currentNumberRange: NSRange = NSMakeRange(0,11)
     /// The range of the collectionView, location is the starting number, length is the number of elements
     var numberRange: NSRange {
         set(value) {
@@ -30,7 +46,7 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
             return currentNumberRange
         }
     }
-    
+
     /// Private delegate so callbacks in this class will be called before any child class
     private var actualDelegate: UICollectionViewDelegate?
     /// Private datasource so callbacks in this class will be called before any child class
@@ -63,11 +79,21 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
         self.init(frame: frame)
         initView()
     }
-
+    
     // Init method called from storyboard
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         initView()
+    }
+    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        
+        // Allows cells to increase in size on larger devices
+        //var totalCellWidth = collectionView.frame.size.width - self.totalHorizontalSpacing
+        
+        // Using available cell width, divide by 2 for single cell width and then multiple by aspect ratio for height
+        var size = CGSizeMake(self.cellWidth, collectionView.frame.size.height)
+        return size
     }
     
     /**
@@ -80,16 +106,16 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
         self.collectionViewLayout = UICollectionViewFlowLayoutCenterItem(viewWidth: UIScreen.mainScreen().bounds.size.width)
         self.showsHorizontalScrollIndicator = false
         self.registerClass(RatingCollectionViewCell.self, forCellWithReuseIdentifier: ratingCellID)
-        
-        // create ciruclarview and fix in the middle of the collectionView background
-        circularView = UIView(frame: CGRectMake(0, 0, 100, 100))
-        circularView.backgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
+        // create circularview and fix in the middle of the collectionView background
+        let circularViewDiameter = min(cellWidth * circleDiameterToCellWidthRatio,self.frame.size.height)
+        circularView = UIView(frame: CGRectMake(0, 0, circularViewDiameter,circularViewDiameter))
+        circularView.backgroundColor = circleBackgroundColor
         self.setRoundedViewToDiameter(circularView, diameter: circularView.frame.size.height)
         dummyBackgroundView = UIView(frame: CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
         dummyBackgroundView.addSubview(circularView)
         self.backgroundView = dummyBackgroundView
         
-        setUpAutoLayoutConstraints()
+        setUpAutoLayoutConstraints(circularViewDiameter)
     }
     
     // MARK: CollectionView delegate and datasource
@@ -126,8 +152,8 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
     :param: diameter the desired diameter of your view
     */
     func setRoundedViewToDiameter(view: UIView, diameter: CGFloat) {
-        var saveCenter = view.center
-        var newFrame = CGRectMake(view.frame.origin.x, view.frame.origin.y, diameter, diameter)
+        let saveCenter = view.center
+        let newFrame = CGRectMake(view.frame.origin.x, view.frame.origin.y, diameter, diameter)
         view.frame = newFrame
         view.layer.cornerRadius = diameter / 2.0
         view.center = saveCenter
@@ -144,7 +170,7 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
     */
     func grabCellAttributesAtPoint(point: CGPoint) -> UICollectionViewLayoutAttributes? {
         
-        var visible = self.indexPathsForVisibleItems()
+        let visible = self.indexPathsForVisibleItems()
         
         for paths in visible {
             var layoutAttributes = self.layoutAttributesForItemAtIndexPath(paths as! NSIndexPath)
@@ -164,7 +190,7 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
     :param: scrollView scrollView built into the UICollectionView
     */
     func scrollViewDidScroll(scrollView: UIScrollView) {
-
+        
         // Get centered point within collectionView contentSize, y value not crucial, just needs to always be in center
         var centerPoint = CGPointMake(self.center.x + self.contentOffset.x,
             self.contentSize.height / 2)
@@ -184,14 +210,14 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
                 cell.setAsHighlightedCell()
                 selectedIndexPath = attributes.indexPath
                 
-            } 
+            }
         }
     }
     
     /**
     Autolayout constraints for the circular background view
     */
-    func setUpAutoLayoutConstraints() {
+    func setUpAutoLayoutConstraints(circularViewDiameter: CGFloat) {
         self.circularView.setTranslatesAutoresizingMaskIntoConstraints(false)
         
         self.dummyBackgroundView.addConstraint(NSLayoutConstraint(
@@ -205,13 +231,13 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
         self.dummyBackgroundView.addConstraint(NSLayoutConstraint(
             item:self.circularView, attribute:.Height,
             relatedBy:.Equal, toItem:nil,
-            attribute:.NotAnAttribute, multiplier:1, constant:100))
+            attribute:.NotAnAttribute, multiplier:1, constant:circularViewDiameter))
         self.dummyBackgroundView.addConstraint(NSLayoutConstraint(
             item:self.circularView, attribute:.Width,
             relatedBy:.Equal, toItem:nil,
-            attribute:.NotAnAttribute, multiplier:1, constant:100))
+            attribute:.NotAnAttribute, multiplier:1, constant:circularViewDiameter))
     }
-
+    
 }
 
 
@@ -221,7 +247,13 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
 CollectionViewCell consisting of a number label that varies in size if it is the most centered cell
 */
 class RatingCollectionViewCell: UICollectionViewCell {
-    
+    /// Font face to use for each item in the range
+    let selectedFont = "Helvetica"
+    /// The font color for each unselected item in the range
+    let normalFontColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0)
+    /// The font color for the selected item in the range
+    let highlightedFontColor = UIColor.whiteColor()
+
     var numberLabel: UILabel!
     
     /**
@@ -235,7 +267,7 @@ class RatingCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         
         numberLabel = UILabel()
-        numberLabel.textColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0)
+        numberLabel.textColor = normalFontColor
         numberLabel.font = UIFont(name: "\(selectedFont)-Medium", size: 30)
         self.contentView.addSubview(numberLabel)
         
@@ -250,7 +282,7 @@ class RatingCollectionViewCell: UICollectionViewCell {
     Method to increase number size and animate with a popping effect
     */
     func setAsHighlightedCell() {
-        self.numberLabel.textColor = UIColor.whiteColor()
+        self.numberLabel.textColor = highlightedFontColor
         self.numberLabel.font = UIFont(name: "\(selectedFont)-Bold", size: 65)
         self.numberLabel.transform = CGAffineTransformScale(self.numberLabel.transform, 0.5, 0.5)
         UIView.animateWithDuration(0.3, animations: {
@@ -263,7 +295,7 @@ class RatingCollectionViewCell: UICollectionViewCell {
     Returns cells back to their original state and smaller size.
     */
     func setAsNormalCell() {
-        self.numberLabel.textColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0)
+        self.numberLabel.textColor = normalFontColor
         self.numberLabel.font = UIFont(name: "\(selectedFont)-Medium", size: 30)
         self.numberLabel.transform = CGAffineTransformScale(self.numberLabel.transform, 2.0, 2.0)
         UIView.animateWithDuration(0.1, animations: {
@@ -304,13 +336,12 @@ class UICollectionViewFlowLayoutCenterItem: UICollectionViewFlowLayout {
     init(viewWidth: CGFloat) {
         super.init()
         
-        var cellSize: CGSize = CGSizeMake(65, 100)
-        var inset = viewWidth/2 - cellSize.width/2
-        
+        let inset = viewWidth/2 - self.itemSize.width/2
         self.sectionInset = UIEdgeInsetsMake(0, inset, 0, inset)
         self.scrollDirection = UICollectionViewScrollDirection.Horizontal
-        self.itemSize = CGSizeMake(cellSize.width, cellSize.height)
-        self.minimumInteritemSpacing = 0
+        
+        //Ensure that there is only one row
+        self.minimumInteritemSpacing = CGFloat(UINT16_MAX)
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -321,9 +352,9 @@ class UICollectionViewFlowLayoutCenterItem: UICollectionViewFlowLayout {
     // Method ensures a cell is centered when scrolling has ended
     override func targetContentOffsetForProposedContentOffset(proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
         
-        var width = self.collectionView!.bounds.size.width
-        var proposedContentOffsetCenterX = proposedContentOffset.x + width * CGFloat(0.5)
-        var proposedRect = self.layoutAttributesForElementsInRect(self.collectionView!.bounds) as! [UICollectionViewLayoutAttributes]
+        let width = self.collectionView!.bounds.size.width
+        let proposedContentOffsetCenterX = proposedContentOffset.x + width * CGFloat(0.5)
+        let proposedRect = self.layoutAttributesForElementsInRect(self.collectionView!.bounds) as! [UICollectionViewLayoutAttributes]
         
         var candidateAttributes: UICollectionViewLayoutAttributes?
         for attributes in proposedRect {
@@ -345,7 +376,7 @@ class UICollectionViewFlowLayoutCenterItem: UICollectionViewFlowLayout {
             }
             
         }
-        
+    
         return CGPointMake(candidateAttributes!.center.x - width * CGFloat(0.5), proposedContentOffset.y)
     }
     
@@ -356,6 +387,4 @@ class UICollectionViewFlowLayoutCenterItem: UICollectionViewFlowLayout {
         }
         return false
     }
-    
 }
-
