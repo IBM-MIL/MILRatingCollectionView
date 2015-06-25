@@ -9,8 +9,8 @@ import QuartzCore
 /**
 Reusable CollectionView that acts as a horizontal scrolling number picker
 */
-class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICollectionViewDataSource, UIScrollViewDelegate {
-
+class MILRatingCollectionView: UICollectionView {
+    
     /// Number of cells visible at a time in the view. Even values will show one less cell than selected on startup, due to the view being centered on an initial value
     let numCellsVisible: CGFloat = 5
     
@@ -118,7 +118,31 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
         setUpAutoLayoutConstraints(circularViewDiameter)
     }
     
-    // MARK: CollectionView delegate and datasource
+    /**
+    Method to round corners enough to make a circle based on diameter.
+    
+    :param: view     UIView to circlefy
+    :param: diameter the desired diameter of your view
+    */
+    func setRoundedViewToDiameter(view: UIView, diameter: CGFloat) {
+        
+        let saveCenter = view.center
+        let newFrame = CGRectMake(view.frame.origin.x, view.frame.origin.y, diameter, diameter)
+        view.frame = newFrame
+        view.layer.cornerRadius = diameter / 2.0
+        view.center = saveCenter
+        
+    }
+    
+}
+
+
+extension MILRatingCollectionView: UICollectionViewDelegate {
+    
+}
+
+
+extension MILRatingCollectionView: UICollectionViewDataSource {
     
     // number of items based on number range set by developer
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -126,7 +150,9 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        
         var cell: RatingCollectionViewCell?
+        
         // if preDataSource not set by developer, create cell like normal
         if let ds = preDataSource {
             cell = ds.collectionView(collectionView, cellForItemAtIndexPath: indexPath) as? RatingCollectionViewCell
@@ -138,28 +164,20 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
         
         // sets an initial highlighted cell, only true once
         if !centerIsSet && indexPath == selectedIndexPath {
+            
             cell!.setAsHighlightedCell()
             centerIsSet = true
+            
         }
         
         return cell!
+        
     }
     
-    /**
-    Method to round corners enough to make a circle based on diameter.
-    
-    :param: view     UIView to circlefy
-    :param: diameter the desired diameter of your view
-    */
-    func setRoundedViewToDiameter(view: UIView, diameter: CGFloat) {
-        let saveCenter = view.center
-        let newFrame = CGRectMake(view.frame.origin.x, view.frame.origin.y, diameter, diameter)
-        view.frame = newFrame
-        view.layer.cornerRadius = diameter / 2.0
-        view.center = saveCenter
-    }
-    
-    // MARK ScrollView delegate methods
+}
+
+
+extension MILRatingCollectionView: UIScrollViewDelegate {
     
     /**
     Method replicating the functionality of indexPathForItemAtPoint(), which was not working with the custom flow layout
@@ -241,19 +259,18 @@ class MILRatingCollectionView: UICollectionView, UICollectionViewDelegate, UICol
 }
 
 
-
-
 /**
 CollectionViewCell consisting of a number label that varies in size if it is the most centered cell
 */
 class RatingCollectionViewCell: UICollectionViewCell {
+    
     /// Font face to use for each item in the range
     let selectedFont = "Helvetica"
     /// The font color for each unselected item in the range
     let normalFontColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0)
     /// The font color for the selected item in the range
     let highlightedFontColor = UIColor.whiteColor()
-
+    
     var numberLabel: UILabel!
     
     /**
@@ -282,6 +299,7 @@ class RatingCollectionViewCell: UICollectionViewCell {
     Method to increase number size and animate with a popping effect
     */
     func setAsHighlightedCell() {
+        
         self.numberLabel.textColor = highlightedFontColor
         self.numberLabel.font = UIFont(name: "\(selectedFont)-Bold", size: 65)
         self.numberLabel.transform = CGAffineTransformScale(self.numberLabel.transform, 0.5, 0.5)
@@ -289,12 +307,14 @@ class RatingCollectionViewCell: UICollectionViewCell {
             self.numberLabel.transform = CGAffineTransformMakeScale(1.0,1.0)
             
         })
+        
     }
     
     /**
     Returns cells back to their original state and smaller size.
     */
     func setAsNormalCell() {
+        
         self.numberLabel.textColor = normalFontColor
         self.numberLabel.font = UIFont(name: "\(selectedFont)-Medium", size: 30)
         self.numberLabel.transform = CGAffineTransformScale(self.numberLabel.transform, 2.0, 2.0)
@@ -302,9 +322,11 @@ class RatingCollectionViewCell: UICollectionViewCell {
             self.numberLabel.transform = CGAffineTransformMakeScale(1.0,1.0)
             
         })
+        
     }
     
     func setUpAutoLayoutConstraints() {
+        
         self.numberLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
         
         self.addConstraint(NSLayoutConstraint(
@@ -316,9 +338,8 @@ class RatingCollectionViewCell: UICollectionViewCell {
             relatedBy:.Equal, toItem:self,
             attribute:.CenterY, multiplier:1, constant:0))
     }
+    
 }
-
-
 
 
 /**
