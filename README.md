@@ -67,3 +67,6 @@ Created by [Taylor Franklin](https://github.com/tfrank64)
 
 MILRatingCollectionView is available under the Apache 2.0 license. See the LICENSE file for more info.
 
+## Sample App License
+The PickerTest sample application is available under the Apple SDK Sample Code License. Details in the file called `SAMPLE_APP_LICENSE`
+
