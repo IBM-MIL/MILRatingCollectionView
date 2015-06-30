@@ -1,11 +1,14 @@
-/*
-Licensed Materials - Property of IBM
-© Copyright IBM Corporation 2015. All Rights Reserved.
-*/
+//
+//  ViewController.swift
+//  PickerTest
+//
+//  Created by Taylor Franklin on 1/7/15.
+//  Copyright (c) 2015 MIL. All rights reserved.
+//
 
 import UIKit
 
-class ViewControllerExample: UIViewController {
+class ViewController: UIViewController {
 
     @IBOutlet weak var milRatingCollectionView: MILRatingCollectionView!
     
