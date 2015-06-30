@@ -20,7 +20,7 @@ class MILRatingCollectionView: UICollectionView {
     let circleDiameterToCellWidthRatio: CGFloat = 2.0
     
     /// The background color of the circle that surrounds the selected item
-    let circleBackgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
+    let circleBackgroundColor: UIColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
     
     var dummyBackgroundView: UIView!
     var circularView: UIView!
