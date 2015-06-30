@@ -136,7 +136,7 @@ class MILRatingCollectionView: UICollectionView {
     
 }
 
-
+// Extension needed to properly assign super.delegate
 extension MILRatingCollectionView: UICollectionViewDelegate {
     
 }

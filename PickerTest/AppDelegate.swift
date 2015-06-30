@@ -1,10 +1,7 @@
-//
-//  AppDelegate.swift
-//  PickerTest
-//
-//  Created by Taylor Franklin on 1/7/15.
-//  Copyright (c) 2015 MIL. All rights reserved.
-//
+/*
+Licensed Materials - Property of IBM
+© Copyright IBM Corporation 2015. All Rights Reserved.
+*/
 
 import UIKit
 
