@@ -6,67 +6,8 @@ Licensed Materials - Property of IBM
 import UIKit
 import QuartzCore
 
-// TODO: extend init, enable any kind of UIView, make the collectionViewCell do nothing
 
-//private extension UIView {
-//
-//    /** run the passed closure. if none, resize the first child subview, if any */
-//    func setAsNormalCell(#alternativeAnimation: (()->())?, animationDuration: NSTimeInterval) {
-//
-//        if let alternativeAnimation = alternativeAnimation {
-//            UIView.animateWithDuration(animationDuration, animations: alternativeAnimation)
-//        } else {
-//
-//            if let childView = self.subviews.first as? UIView {
-//
-//                UIView.animateWithDuration(animationDuration) {
-//
-//                    childView.frame = CGRect(
-//                        origin: self.frame.origin,
-//                        size: CGSize(
-//                            width: self.frame.width/2,
-//                            height: self.frame.height/2
-//                        )
-//                    )
-//
-//                }
-//
-//            }
-//
-//        }
-//
-//    }
-//
-//    /** run the passed closure. if none, resize the first child subview, if any */
-//    func setAsHighlightedCell(#alternativeAnimation: (()->())?, animationDuration: NSTimeInterval) {
-//
-//        if let alternativeAnimation = alternativeAnimation {
-//            UIView.animateWithDuration(animationDuration, animations: alternativeAnimation)
-//        } else {
-//
-//            if let childView = self.subviews.first as? UIView {
-//
-//                UIView.animateWithDuration(animationDuration) {
-//
-//                    childView.frame = CGRect(
-//                        origin: self.frame.origin,
-//                        size: CGSize(
-//                            width: self.frame.width,
-//                            height: self.frame.height
-//                        )
-//                    )
-//
-//                }
-//
-//            }
-//
-//        }
-//
-//    }
-//
-//}
-
-/** CollectionViewCell consisting of a number label that varies in size if it is the most centered cell */
+/** RatingCollectionViewCell consisting of a number label that varies in size if it is the most centered cell */
 private final class RatingCollectionViewCell: UIView {
     
     struct Constants {
@@ -112,8 +53,6 @@ private final class RatingCollectionViewCell: UIView {
         _numberLabel.font = UIFont(name: unHighlightedFontName, size: Constants.UnHighlightedFontSize)
         _numberLabel.textAlignment = NSTextAlignment.Center
         
-        self.backgroundColor = UIColor.blueColor()
-        
         self.addSubview(_numberLabel)
         
     }
@@ -145,7 +84,7 @@ private final class RatingCollectionViewCell: UIView {
             
             let label = self._numberLabel
             
-            label.textColor = Constants.HighlightedFontColor
+            label.textColor = Constants.NormalFontColor
             label.font = UIFont(name: "\(self.unHighlightedFontName)", size: Constants.UnHighlightedFontSize)
             
         }
@@ -163,14 +102,18 @@ final class MILRatingCollectionView: UIView {
     /** API */
     private struct Constants {
         
+        /// Movable circle background
+        static let Animated = true
+        static let AnimationDuration = NSTimeInterval(0.8)
+        
         /// Number of cells visible at a time in the view. Even values will show one less cell than selected on startup, due to the view being centered on an initial value
         static let NumCellsVisible: Int = 5
         
         /// The minimum number of pixels each cell should be. Does not usually need be changed. Only takes effect when the numCellsVisible is set to a value that leaves little room for each cell.
         static let MinCellWidth: CGFloat = 35
         
-        /// The size of the circle relative to the size of the cell
-        static let CircleDiameterToCellWidthRatio: CGFloat = 2.0
+        /// The size of the circle relative to the size of the view's height
+        static let CircleDiameterToViewHeightRatio: CGFloat = 0.6
         
         /// The background color of the circle that surrounds the selected item
         static let CircleBackgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
@@ -180,7 +123,7 @@ final class MILRatingCollectionView: UIView {
     
     // MARK: Instance Properties
     /** Set this to strictly use a range of integers */
-    private var _range: NSRange! = NSMakeRange( 0, 11)       // supporting instance variable, don't touch this
+    private var _range: NSRange! = NSMakeRange(1, 11)       // supporting instance variable, don't touch this
     var range: NSRange? {                                   // touch this
         
         get {
@@ -203,9 +146,25 @@ final class MILRatingCollectionView: UIView {
     
     /** END API */
     
-    // scrollView (z = 3, data z = 4)
+    
+    // TODO: implement
+    // coder (storyboard) vs. programmatic creation
+    //    private var _storyboardUsed = false
+    //    var adjustedSize: CGSize {
+    //
+    //        if _storyboardUsed {
+    //
+    //            let screen = UIScreen.mainScreen()
+    //            let coordinateSpace = screen.coordinateSpace
+    //            return self.superview!.convertRect(self.frame, fromCoordinateSpace: coordinateSpace).size
+    //
+    //        } else {
+    //            return self.frame.size
+    //        }
+    //
+    //    }
+    
     private var _scrollView: UIScrollView!
-    private var _currentCellIndex: Int = 0
     
     private var _leftCompensationViews: [RatingCollectionViewCell] = []
     private var _innerCellViews: [RatingCollectionViewCell] = []
@@ -215,12 +174,17 @@ final class MILRatingCollectionView: UIView {
         return _leftCompensationViews + _innerCellViews + _rightCompensationViews
     }
     
+    private var _currentlyHighlightedCellIndex: Int = 0
+    
     // circularView (dummy z = 2, circle z = 3)
     private var _dummyOverlayView: UIView!
     private var _circularView: UIView!
     
     private var _cellWidth: CGFloat {
-        return max(Constants.MinCellWidth, frame.size.width/CGFloat(Constants.NumCellsVisible))
+        return max(
+            Constants.MinCellWidth,
+            frame.size.width/CGFloat(Constants.NumCellsVisible)
+        )
     }
     
     
@@ -248,8 +212,12 @@ final class MILRatingCollectionView: UIView {
     
     required init(coder aDecoder: NSCoder) {
         
-        super.init(coder: aDecoder)
-        initView()
+        fatalError("init(coder:) has not been implemented")
+        
+        //        super.init(coder: aDecoder)
+        //
+        //        _storyboardUsed = true
+        //        initView()
         
     }
     
@@ -260,35 +228,18 @@ final class MILRatingCollectionView: UIView {
     */
     private func initView() {
         
-        println(self.frame)
-        
         createDummyOverlayView()
         createCircularView()
         addCircularViewToDummyOverlayView()
-        setUpCircularViewAutoLayoutConstraintsBasedOnOverlayBackgroundView()
-        configureScrollViewBehindEverythingExcludingContentSize()
+        configureScrollViewExcludingContentSize()
         configureScrollViewContentSizeAndPopulateScrollView()
-        
-        
-        
-    }
-    
-    private func configureScrollViewBehindEverythingExcludingContentSize() {
-        
-        _scrollView = UIScrollView(frame: CGRect(origin: CGPointZero, size: self.frame.size))
-        
-        _scrollView.delegate = self
-        _scrollView.pagingEnabled = true
-        _scrollView.showsHorizontalScrollIndicator = false
-        _scrollView.backgroundColor = UIColor.brownColor()
-        
-        self.addSubview(_scrollView)
+        configureInitialScrollViewHighlightedIndex()
         
     }
     
     private func createDummyOverlayView() {
         
-        let size = self.frame.size
+        var size: CGSize { return self.frame.size }
         
         let dummyBackgroundViewFrame = CGRect(
             x: 0.0,
@@ -306,40 +257,20 @@ final class MILRatingCollectionView: UIView {
         
     }
     
-    /** create circularview and fix in the middle of the collectionView background */
     private func createCircularView() {
         
-        let circularViewDiameter = min(_cellWidth * Constants.CircleDiameterToCellWidthRatio, self.frame.size.height)
+        let circularViewDiameter = max(self.frame.height * Constants.CircleDiameterToViewHeightRatio, 2*Constants.MinCellWidth)
         
-        let circularViewFrame = CGRect(
-            x: 0.0,
-            y: 0.0,
+        let temporaryCircularViewFrame = CGRect(
+            x: -circularViewDiameter/2,
+            y: -circularViewDiameter/2,
             width: circularViewDiameter,
             height: circularViewDiameter
         )
         
-        _circularView = UIView(frame: circularViewFrame)
+        _circularView = UIView(frame: temporaryCircularViewFrame)
+        _circularView.layer.cornerRadius = circularViewDiameter/2.0
         _circularView.backgroundColor = Constants.CircleBackgroundColor
-        
-        roundCircularViewWithDiameter(circularViewDiameter)
-        
-    }
-    
-    private func roundCircularViewWithDiameter(diameter: CGFloat) {
-        
-        let saveCenter = _circularView.center
-        let circleOrigin = _circularView.frame.origin
-        
-        let newCircleFrame = CGRect(
-            x: circleOrigin.x,
-            y: circleOrigin.y,
-            width: diameter,
-            height: diameter
-        )
-        
-        _circularView.frame = newCircleFrame
-        _circularView.layer.cornerRadius = diameter/2.0
-        _circularView.center = saveCenter
         
     }
     
@@ -347,55 +278,16 @@ final class MILRatingCollectionView: UIView {
         _dummyOverlayView.addSubview(_circularView)
     }
     
-    private func setUpCircularViewAutoLayoutConstraintsBasedOnOverlayBackgroundView() {
+    /** sets userInteractionEnabled to 'false' initially, see the method 'configureInitialScrollViewHighlightedIndex()' in 'initView()'  */
+    private func configureScrollViewExcludingContentSize() {
         
-        _circularView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        _scrollView = UIScrollView(frame: CGRect(origin: CGPointZero, size: self.frame.size))
         
-        let circularViewDiameter = _circularView.frame.width
+        _scrollView.delegate = self
+        _scrollView.showsHorizontalScrollIndicator = false
+        _scrollView.userInteractionEnabled = false
         
-        let constraintsToAdd = [
-            
-            NSLayoutConstraint(
-                item: _circularView,
-                attribute: .CenterX,
-                relatedBy: .Equal,
-                toItem: _dummyOverlayView,
-                attribute: .CenterX,
-                multiplier: 1,
-                constant: 0
-            ),
-            
-            NSLayoutConstraint(
-                item: _circularView,
-                attribute: .CenterY,
-                relatedBy: .Equal,
-                toItem: _dummyOverlayView,
-                attribute: .CenterY,
-                multiplier: 1,
-                constant: 0
-            ),
-            
-            NSLayoutConstraint(
-                item: _circularView,
-                attribute: .Height,
-                relatedBy: .Equal,
-                toItem:nil,
-                attribute: .NotAnAttribute,
-                multiplier:1,
-                constant: circularViewDiameter),
-            
-            NSLayoutConstraint(
-                item: _circularView,
-                attribute: .Width,
-                relatedBy: .Equal,
-                toItem:nil,
-                attribute: .NotAnAttribute,
-                multiplier:1,
-                constant: circularViewDiameter)
-            
-        ]
-        
-        _dummyOverlayView.addConstraints(constraintsToAdd)
+        self.addSubview(_scrollView)
         
     }
     
@@ -407,7 +299,7 @@ final class MILRatingCollectionView: UIView {
             )
         )
         
-        let totalItemsCount = Constants.NumCellsVisible + 2*compensationCountLeftRight
+        let totalItemsCount = _range.length + 2*compensationCountLeftRight
         
         // content size
         _scrollView.contentSize = CGSize(
@@ -417,45 +309,41 @@ final class MILRatingCollectionView: UIView {
         
         // populating scrollview
         var runningXOffset: CGFloat = 0.0
+        var newViewToAdd: RatingCollectionViewCell!
         
+        // generate indices to insert as text
+        var indicesToDrawAsText: [Int] = []
+        var rangeIndex = 0
+        
+        for var i = _range.location; i < _range.location + _range.length; i++ {
+            
+            indicesToDrawAsText.insert(i, atIndex: rangeIndex)
+            rangeIndex++
+            
+        }
+        
+        // populate left empty views, then middle, then right empty views
         for var index = 0; index < totalItemsCount; index++ {
             
-            let newViewFrame = CGRect(
-                x: runningXOffset,
-                y: 0.0,
-                width: _cellWidth,
-                height: self.frame.height
-            )
+            let newViewFrame = newScrollViewChildViewFrameWithXOffset(runningXOffset)
+            newViewToAdd = RatingCollectionViewCell(frame: newViewFrame)
             
             switch index {
                 
             case 0 ..< compensationCountLeftRight:
                 
-                _leftCompensationViews.insert(
-                    RatingCollectionViewCell(frame: newViewFrame),
-                    atIndex: index
-                )
+                _leftCompensationViews.insert(newViewToAdd, atIndex: index)
                 
             case compensationCountLeftRight ..< (totalItemsCount-compensationCountLeftRight):
                 
                 let innerIndexingCompensation = index - compensationCountLeftRight
-                
-                let newView = RatingCollectionViewCell(frame: newViewFrame)
-                newView._numberLabel.text = "\(innerIndexingCompensation)"
-                
-                _innerCellViews.insert(
-                    newView,
-                    atIndex: innerIndexingCompensation
-                )
+                newViewToAdd._numberLabel.text = "\(indicesToDrawAsText[innerIndexingCompensation])"
+                _innerCellViews.insert(newViewToAdd, atIndex: innerIndexingCompensation)
                 
             case (totalItemsCount-compensationCountLeftRight) ..< totalItemsCount:
                 
                 let rightIndexingCompensation = index - (totalItemsCount - compensationCountLeftRight)
-                
-                _rightCompensationViews.insert(
-                    RatingCollectionViewCell(frame: newViewFrame),
-                    atIndex: rightIndexingCompensation
-                )
+                _rightCompensationViews.insert(newViewToAdd, atIndex: rightIndexingCompensation)
                 
             default:
                 println("An error has occurred within the MILRatingCollectionView.")
@@ -466,8 +354,50 @@ final class MILRatingCollectionView: UIView {
             
         }
         
+        // add these newly generated views to the scrollview
         for cellView in _cellViews {
             _scrollView.addSubview(cellView)
+        }
+        
+    }
+    
+    private func newScrollViewChildViewFrameWithXOffset(xOffset: CGFloat) -> CGRect {
+        
+        return CGRect(
+            x: xOffset,
+            y: 0.0,
+            width: _cellWidth,
+            height: self.frame.height
+        )
+        
+    }
+    
+    private func configureInitialScrollViewHighlightedIndex() {
+        
+        _currentlyHighlightedCellIndex = 0
+        _innerCellViews[_currentlyHighlightedCellIndex].setAsHighlightedCell()
+        
+    }
+    
+    // MARK: animation on display
+    override func didMoveToSuperview() {
+        
+        let moveCircleToCenter: () -> () = {
+            self._circularView.center = self._dummyOverlayView.center
+        }
+        
+        if Constants.Animated {
+            
+            UIView.animateWithDuration(Constants.AnimationDuration, animations: moveCircleToCenter) {
+                (completed: Bool) in self._scrollView.userInteractionEnabled = true
+            }
+            
+        } else {
+            
+            UIView.animateWithDuration(0.0, animations: moveCircleToCenter) {
+                (completed: Bool) in self._scrollView.userInteractionEnabled = true
+            }
+            
         }
         
     }
@@ -486,29 +416,18 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
         
         let centeredX = self.center.x + _scrollView.contentOffset.x
         
-        // can initially be items in the left compensation views to center our 0th index item in the circle
         let newCellIndex = Int(
-            floor(centeredX / _cellWidth) + CGFloat(_leftCompensationViews.count)
+            floor(
+                (centeredX - _cellWidth/2) / _cellWidth
+            )
         )
         
-        if _currentCellIndex != newCellIndex && !(newCellIndex > _cellViews.count-1) {
+        if _currentlyHighlightedCellIndex != newCellIndex && !(newCellIndex > _cellViews.count-1) {
             
-            
-            
-            //            let setAsHighLightedBlock: ()->() {
-            //
-            //                if let label = self.subviews.first as? UILabel {
-            //
-            //
-            //
-            //                }
-            //
-            //            }
-            
-            _cellViews[_currentCellIndex].setAsNormalCell()
+            _cellViews[_currentlyHighlightedCellIndex].setAsNormalCell()
             _cellViews[newCellIndex].setAsHighlightedCell()
             
-            _currentCellIndex = newCellIndex
+            _currentlyHighlightedCellIndex = newCellIndex
             
             
             
@@ -517,71 +436,3 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
     }
     
 }
-
-///**
-//Custom collectionViewFlowLayout in order to have paging on the centered cell
-//*/
-//class UICollectionViewFlowLayoutCenterItem: UICollectionViewFlowLayout {
-//
-//    /**
-//    Init method that sets default properties for collectionViewlayout
-//
-//    :param: viewWidth width of screen to base paddings off of.
-//
-//    :returns: UICollectionViewFlowLayout object
-//    */
-//    init(viewWidth: CGFloat) {
-//        super.init()
-//
-//        let inset = viewWidth/2 - self.itemSize.width/2
-//        self.sectionInset = UIEdgeInsetsMake(0, inset, 0, inset)
-//        self.scrollDirection = UICollectionViewScrollDirection.Horizontal
-//
-//        //Ensure that there is only one row
-//        self.minimumInteritemSpacing = CGFloat(UINT16_MAX)
-//    }
-//
-//    required init(coder aDecoder: NSCoder) {
-//        super.init(coder: aDecoder)
-//    }
-//
-//    // Obj-C version taken from: https://gist.github.com/mmick66/9812223
-//    // Method ensures a cell is centered when scrolling has ended
-//    override func targetContentOffsetForProposedContentOffset(proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
-//
-//        let width = self.collectionView!.bounds.size.width
-//        let proposedContentOffsetCenterX = proposedContentOffset.x + width * CGFloat(0.5)
-//        let proposedRect = self.layoutAttributesForElementsInRect(self.collectionView!.bounds) as! [UICollectionViewLayoutAttributes]
-//
-//        var candidateAttributes: UICollectionViewLayoutAttributes?
-//        for attributes in proposedRect {
-//
-//            // this ignores header and footer views
-//            if attributes.representedElementCategory != UICollectionElementCategory.Cell {
-//                continue
-//            }
-//
-//            // set initial value first time through loop
-//            if (candidateAttributes == nil) {
-//                candidateAttributes = attributes
-//                continue
-//            }
-//
-//            // if placement is desired, update candidateAttributes
-//            if (fabsf(Float(attributes.center.x) - Float(proposedContentOffsetCenterX)) < fabsf(Float(candidateAttributes!.center.x) - Float(proposedContentOffsetCenterX))) {
-//                candidateAttributes = attributes
-//            }
-//
-//        }
-//
-//        return CGPointMake(candidateAttributes!.center.x - width * CGFloat(0.5), proposedContentOffset.y)
-//    }
-//
-//    override func shouldInvalidateLayoutForBoundsChange(newBounds: CGRect) -> Bool {
-//        var oldBounds = self.collectionView!.bounds
-//        if CGRectGetWidth(oldBounds) != CGRectGetWidth(newBounds) {
-//            return true
-//        }
-//        return false
-//    }
-//}
