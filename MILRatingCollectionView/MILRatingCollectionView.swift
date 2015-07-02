@@ -130,24 +130,19 @@ final class MILRatingCollectionView: UIView {
             return _range
         }
         
+        // on set, check if already being displayed before creating redundant text
         set {
+            
             _range = newValue
             initView()
         }
         
     }
     
-    /**
-    Use the method(s)
-    - displayViews(views: UIView...)
-    - displayViews(views: [UIView] )
-    */
-    //    private(set) var views: [UIView]?
-    
     /** END API */
     
     
-    // TODO: implement
+    // TODO: implement, screen points vs. pixels is buggy (Swift issue?)
     // coder (storyboard) vs. programmatic creation
     //    private var _storyboardUsed = false
     //    var adjustedSize: CGSize {
@@ -176,7 +171,6 @@ final class MILRatingCollectionView: UIView {
     
     private var _currentlyHighlightedCellIndex: Int = 0
     
-    // circularView (dummy z = 2, circle z = 3)
     private var _dummyOverlayView: UIView!
     private var _circularView: UIView!
     
@@ -185,20 +179,6 @@ final class MILRatingCollectionView: UIView {
             Constants.MinCellWidth,
             frame.size.width/CGFloat(Constants.NumCellsVisible)
         )
-    }
-    
-    
-    // MARK: Getters & Setters
-    func displayViews(views: UIView...) {
-        
-        // TODO: implement
-        
-    }
-    
-    func displayViews(views: [UIView]) {
-        
-        // TODO: implement
-        
     }
     
     
@@ -211,29 +191,39 @@ final class MILRatingCollectionView: UIView {
     }
     
     required init(coder aDecoder: NSCoder) {
-        
         fatalError("init(coder:) has not been implemented")
-        
-        //        super.init(coder: aDecoder)
-        //
-        //        _storyboardUsed = true
-        //        initView()
-        
     }
     
     /**
     Externalized to
-    - re-configure on device rotation
+    - re-configure on device rotation / range property set
     - minimize duplicated code
     */
     private func initView() {
         
+        cleanExistingViews()
         createDummyOverlayView()
         createCircularView()
         addCircularViewToDummyOverlayView()
         configureScrollViewExcludingContentSize()
         configureScrollViewContentSizeAndPopulateScrollView()
         configureInitialScrollViewHighlightedIndex()
+        
+    }
+    
+    private func cleanExistingViews() {
+        
+        for view in self.subviews {
+            
+            if let view = view as? UIView {
+                view.removeFromSuperview()
+            }
+            
+        }
+        
+        _leftCompensationViews = []
+        _rightCompensationViews = []
+        _innerCellViews = []
         
     }
     
@@ -429,7 +419,11 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
         // done to prevent recalculating / potential errors
         let newCellIndex = self.newCellIndex
         
-        if _currentlyHighlightedCellIndex != newCellIndex && !(newCellIndex > _cellViews.count-1) {
+        let shouldHighlightAnotherCell = _currentlyHighlightedCellIndex != newCellIndex
+        let outOfBoundsScrollingLeft = newCellIndex < 0
+        let outOfBoundsScrollingRight = (newCellIndex > _cellViews.count-1)
+        
+        if shouldHighlightAnotherCell && !outOfBoundsScrollingLeft && !outOfBoundsScrollingRight {
             
             _cellViews[_currentlyHighlightedCellIndex].setAsNormalCell()
             _cellViews[newCellIndex].setAsHighlightedCell()
