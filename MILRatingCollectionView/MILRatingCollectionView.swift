@@ -133,23 +133,22 @@ final class MILRatingCollectionView: UIView {
     
     // MARK: Instance Properties
     /** Set this to strictly use a range of integers */
-    private var _range: NSRange! = NSMakeRange(1, 11)       // supporting instance variable, don't touch this
-    var range: NSRange? {                                   // touch this
+    private var _numberRange: NSRange! = NSMakeRange(1, 11)       // supporting instance variable, don't touch this
+    var numberRange: NSRange? {                                   // touch this
         
         get {
-            return _range
+            return _numberRange
         }
         
         // on set, check if already being displayed before creating redundant text
         set {
             
-            _range = newValue
+            _numberRange = newValue
             layoutSubviews()
             
         }
         
     }
-    
     
     /** END API */
     
@@ -166,9 +165,10 @@ final class MILRatingCollectionView: UIView {
     
     private var _currentlyHighlightedCellIndex: Int = 0
     
-    // circularView (dummy z = 2, circle z = 3)
     private var _dummyOverlayView: UIView!
-    private var _circularView: UIView!
+    
+    // exposed to support original API
+    var circularView: UIView!
     
     private var _cellWidth: CGFloat {
         return max(
@@ -205,8 +205,8 @@ final class MILRatingCollectionView: UIView {
         return CGRect(
             x: _size.width/2,
             y: _size.height/2,
-            width: _circularView.frame.width,
-            height: _circularView.frame.height
+            width: self.circularView.frame.width,
+            height: self.circularView.frame.height
         )
         
     }
@@ -274,14 +274,14 @@ final class MILRatingCollectionView: UIView {
             height: _circleViewDiameter
         )
         
-        _circularView = UIView(frame: temporaryCircularViewFrame)
-        _circularView.layer.cornerRadius = _circleViewDiameter/2.0
-        _circularView.backgroundColor = Constants.CircleBackgroundColor
+        self.circularView = UIView(frame: temporaryCircularViewFrame)
+        self.circularView.layer.cornerRadius = _circleViewDiameter/2.0
+        self.circularView.backgroundColor = Constants.CircleBackgroundColor
         
     }
     
     private func addCircularViewToDummyOverlayView() {
-        _dummyOverlayView.addSubview(_circularView)
+        _dummyOverlayView.addSubview(self.circularView)
     }
     
     /** sets userInteractionEnabled to 'false' initially, see the method 'configureInitialScrollViewHighlightedIndex()' in 'initView()'  */
@@ -305,7 +305,7 @@ final class MILRatingCollectionView: UIView {
             )
         )
         
-        let totalItemsCount = _range.length + 2*compensationCountLeftRight
+        let totalItemsCount = self.numberRange!.length + 2*compensationCountLeftRight
         
         // content size
         _scrollView.contentSize = CGSize(
@@ -321,7 +321,8 @@ final class MILRatingCollectionView: UIView {
         var indicesToDrawAsText: [Int] = []
         var rangeIndex = 0
         
-        for var i = _range.location; i < _range.location + _range.length; i++ {
+        let range = self.numberRange!
+        for var i = range.location; i < range.location + range.length; i++ {
             
             indicesToDrawAsText.insert(i, atIndex: rangeIndex)
             rangeIndex++
@@ -388,7 +389,7 @@ final class MILRatingCollectionView: UIView {
     private func animateCircleToCenter() {
         
         let moveCircleToCenter: () -> () = {
-            self._circularView.center = self._dummyOverlayView.center
+            self.circularView.center = self._dummyOverlayView.center
         }
         
         if Constants.Animated {
