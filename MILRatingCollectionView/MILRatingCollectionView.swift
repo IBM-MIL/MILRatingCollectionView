@@ -144,7 +144,7 @@ final class MILRatingCollectionView: UIView {
         set {
             
             _range = newValue
-            didMoveToSuperview()
+            layoutSubviews()
             
         }
         
