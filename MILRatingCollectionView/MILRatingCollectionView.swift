@@ -124,6 +124,10 @@ final class MILRatingCollectionView: UIView {
         /// The background color of the circle that surrounds the selected item
         static let CircleBackgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
         
+        // dont touch
+        static let ErrorString = "An error has occurred within the MILRatingCollectionView."
+        static let InitErrorString = "init(coder:) has not been implemented"
+        
     }
     
     
@@ -140,13 +144,14 @@ final class MILRatingCollectionView: UIView {
         set {
             
             _range = newValue
-            initView()
+            didMoveToSuperview()
             
         }
         
     }
     
     
+    /** END API */
     
     
     private var _scrollView: UIScrollView!
@@ -161,6 +166,7 @@ final class MILRatingCollectionView: UIView {
     
     private var _currentlyHighlightedCellIndex: Int = 0
     
+    // circularView (dummy z = 2, circle z = 3)
     private var _dummyOverlayView: UIView!
     private var _circularView: UIView!
     
@@ -171,25 +177,48 @@ final class MILRatingCollectionView: UIView {
         )
     }
     
+    // MARK: convenience calculations
+    private var _size: CGSize { return self.frame.size }
+    
+    private var _dummyViewFrame: CGRect {
+        
+        return CGRect(
+            x: 0.0,
+            y: 0.0,
+            width: _size.width,
+            height: _size.height
+        )
+        
+    }
+    
+    private var _circleViewDiameter: CGFloat {
+        
+        return max(
+            _size.height * Constants.CircleDiameterToViewHeightRatio,
+            2*Constants.MinCellWidth
+        )
+        
+    }
+    
+    private var _circleViewFrame: CGRect {
+        
+        return CGRect(
+            x: _size.width/2,
+            y: _size.height/2,
+            width: _circularView.frame.width,
+            height: _circularView.frame.height
+        )
+        
+    }
+    
+    private var _scrollViewFrame: CGRect {
+        return CGRect(origin: CGPointZero, size: _size)
+    }
+    
     
     // MARK: Instance Methods
-    override init(frame: CGRect) {
-        
-        super.init(frame: frame)
-        initView()
-        
-    }
-    
-    required init(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    /**
-    Externalized to
-    - re-configure on device rotation
-    - minimize duplicated code
-    */
-    private func initView() {
+    // effectively an init + animation on display
+    override func didMoveToSuperview() {
         
         cleanExistingViews()
         createDummyOverlayView()
@@ -198,6 +227,14 @@ final class MILRatingCollectionView: UIView {
         configureScrollViewExcludingContentSize()
         configureScrollViewContentSizeAndPopulateScrollView()
         configureInitialScrollViewHighlightedIndex()
+        animateCircleToCenter()
+        
+    }
+    
+    override func layoutSubviews() {
+        
+        cleanExistingViews()
+        didMoveToSuperview()
         
     }
     
@@ -219,16 +256,7 @@ final class MILRatingCollectionView: UIView {
     
     private func createDummyOverlayView() {
         
-        var size: CGSize { return self.frame.size }
-        
-        let dummyBackgroundViewFrame = CGRect(
-            x: 0.0,
-            y: 0.0,
-            width: size.width,
-            height: size.height
-        )
-        
-        _dummyOverlayView = UIView(frame: dummyBackgroundViewFrame)
+        _dummyOverlayView = UIView(frame: _dummyViewFrame)
         _dummyOverlayView.backgroundColor = UIColor.brownColor()
         _dummyOverlayView.userInteractionEnabled = false
         
@@ -239,17 +267,15 @@ final class MILRatingCollectionView: UIView {
     
     private func createCircularView() {
         
-        let circularViewDiameter = max(self.frame.height * Constants.CircleDiameterToViewHeightRatio, 2*Constants.MinCellWidth)
-        
         let temporaryCircularViewFrame = CGRect(
-            x: -circularViewDiameter/2,
-            y: -circularViewDiameter/2,
-            width: circularViewDiameter,
-            height: circularViewDiameter
+            x: -_circleViewDiameter/2,
+            y: -_circleViewDiameter/2,
+            width: _circleViewDiameter,
+            height: _circleViewDiameter
         )
         
         _circularView = UIView(frame: temporaryCircularViewFrame)
-        _circularView.layer.cornerRadius = circularViewDiameter/2.0
+        _circularView.layer.cornerRadius = _circleViewDiameter/2.0
         _circularView.backgroundColor = Constants.CircleBackgroundColor
         
     }
@@ -261,7 +287,7 @@ final class MILRatingCollectionView: UIView {
     /** sets userInteractionEnabled to 'false' initially, see the method 'configureInitialScrollViewHighlightedIndex()' in 'initView()'  */
     private func configureScrollViewExcludingContentSize() {
         
-        _scrollView = UIScrollView(frame: CGRect(origin: CGPointZero, size: self.frame.size))
+        _scrollView = UIScrollView(frame: _scrollViewFrame)
         
         _scrollView.delegate = self
         _scrollView.showsHorizontalScrollIndicator = false
@@ -326,7 +352,7 @@ final class MILRatingCollectionView: UIView {
                 _rightCompensationViews.insert(newViewToAdd, atIndex: rightIndexingCompensation)
                 
             default:
-                println("An error has occurred within the MILRatingCollectionView.")
+                println(Constants.ErrorString)
                 
             }
             
@@ -359,8 +385,7 @@ final class MILRatingCollectionView: UIView {
         
     }
     
-    // MARK: animation on display
-    override func didMoveToSuperview() {
+    private func animateCircleToCenter() {
         
         let moveCircleToCenter: () -> () = {
             self._circularView.center = self._dummyOverlayView.center
