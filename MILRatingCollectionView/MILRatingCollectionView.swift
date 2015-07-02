@@ -7,20 +7,27 @@ import UIKit
 import QuartzCore
 
 
-/** RatingCollectionViewCell consisting of a number label that varies in size if it is the most centered cell */
+/**
+RatingCollectionViewCell consisting of a number label that varies in size if it is the most centered cell
+NOTE: If changing constants below, don't forget to use "digit.0" to avoid CGFloat / Int calculation issues
+*/
 private final class RatingCollectionViewCell: UIView {
     
     struct Constants {
         
         static let Font = "Helvetica"
         
-        static let UnHighlightedFontSize: CGFloat = 30
-        static let HighlightedFontSize: CGFloat = 65
+        static let FontSize: CGFloat = 60
+        
+        static let FontHighlightedAnimationScalingTransform = CGFloat(1.1)
         
         static let NormalFontColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0)
         static let HighlightedFontColor = UIColor.whiteColor()
         
-        static let AnimationDuration = NSTimeInterval(0.25)
+        static let AnimationDuration = NSTimeInterval(0.5)
+        
+        // don't touch
+        static var FontUnHighlightedAnimationScalingTransform: CGFloat { return (1 / FontHighlightedAnimationScalingTransform) }
         
     }
     
@@ -48,12 +55,10 @@ private final class RatingCollectionViewCell: UIView {
     private func initCell() {
         
         _numberLabel = UILabel(frame: CGRect(origin: CGPointZero, size: self.frame.size))
-        
-        _numberLabel.textColor = Constants.NormalFontColor
-        _numberLabel.font = UIFont(name: unHighlightedFontName, size: Constants.UnHighlightedFontSize)
         _numberLabel.textAlignment = NSTextAlignment.Center
         
         self.addSubview(_numberLabel)
+        self.setAsNormalCell()
         
     }
     
@@ -65,9 +70,9 @@ private final class RatingCollectionViewCell: UIView {
         let setAsHighlightedAnimation: () -> () = {
             
             let label = self._numberLabel
-            
             label.textColor = Constants.HighlightedFontColor
-            label.font = UIFont(name: "\(self.highlightedFontName)", size: Constants.HighlightedFontSize)
+            label.font = UIFont(name: "\(self.highlightedFontName)", size: Constants.FontSize)
+            label.transform = CGAffineTransformScale(label.transform, Constants.FontHighlightedAnimationScalingTransform, Constants.FontHighlightedAnimationScalingTransform)
             
         }
         
@@ -85,7 +90,8 @@ private final class RatingCollectionViewCell: UIView {
             let label = self._numberLabel
             
             label.textColor = Constants.NormalFontColor
-            label.font = UIFont(name: "\(self.unHighlightedFontName)", size: Constants.UnHighlightedFontSize)
+            label.font = UIFont(name: "\(self.unHighlightedFontName)", size: Constants.FontSize)
+            label.transform = CGAffineTransformScale(label.transform, Constants.FontUnHighlightedAnimationScalingTransform, Constants.FontUnHighlightedAnimationScalingTransform)
             
         }
         
@@ -135,29 +141,13 @@ final class MILRatingCollectionView: UIView {
             
             _range = newValue
             initView()
+            
         }
         
     }
     
-    /** END API */
     
     
-    // TODO: implement, screen points vs. pixels is buggy (Swift issue?)
-    // coder (storyboard) vs. programmatic creation
-    //    private var _storyboardUsed = false
-    //    var adjustedSize: CGSize {
-    //
-    //        if _storyboardUsed {
-    //
-    //            let screen = UIScreen.mainScreen()
-    //            let coordinateSpace = screen.coordinateSpace
-    //            return self.superview!.convertRect(self.frame, fromCoordinateSpace: coordinateSpace).size
-    //
-    //        } else {
-    //            return self.frame.size
-    //        }
-    //
-    //    }
     
     private var _scrollView: UIScrollView!
     
@@ -196,7 +186,7 @@ final class MILRatingCollectionView: UIView {
     
     /**
     Externalized to
-    - re-configure on device rotation / range property set
+    - re-configure on device rotation
     - minimize duplicated code
     */
     private func initView() {
