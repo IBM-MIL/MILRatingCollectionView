@@ -407,6 +407,18 @@ final class MILRatingCollectionView: UIView {
 
 extension MILRatingCollectionView: UIScrollViewDelegate {
     
+    var centeredX: CGFloat {
+        return self.center.x + _scrollView.contentOffset.x
+    }
+    
+    var newCellIndex: Int {
+        return Int(
+            floor(
+                (self.centeredX - _cellWidth/2) / _cellWidth
+            )
+        )
+    }
+    
     /**
     Method that recognizes center cell and highlights it while leaving other cells normal
     
@@ -414,13 +426,8 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
     */
     func scrollViewDidScroll(scrollView: UIScrollView) {
         
-        let centeredX = self.center.x + _scrollView.contentOffset.x
-        
-        let newCellIndex = Int(
-            floor(
-                (centeredX - _cellWidth/2) / _cellWidth
-            )
-        )
+        // done to prevent recalculating / potential errors
+        let newCellIndex = self.newCellIndex
         
         if _currentlyHighlightedCellIndex != newCellIndex && !(newCellIndex > _cellViews.count-1) {
             
@@ -429,10 +436,27 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
             
             _currentlyHighlightedCellIndex = newCellIndex
             
-            
-            
         }
         
     }
     
+    /**
+    Reference [1]
+    Adjusts scrolling to end exactly on an item
+    */
+    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        
+        var targetCellViewIndex = floor(targetContentOffset.memory.x / _cellWidth)
+        
+        if ((targetContentOffset.memory.x - floor(targetContentOffset.memory.x / _cellWidth) * _cellWidth) > _cellWidth) {
+            targetCellViewIndex++
+        }
+        
+        targetContentOffset.memory.x = targetCellViewIndex * _cellWidth
+        
+    }
+    
 }
+
+/** REFERENCES */
+// [1] http://www.widecodes.com/7iHmeXqqeU/add-snapto-position-in-a-uitableview-or-uiscrollview.html
