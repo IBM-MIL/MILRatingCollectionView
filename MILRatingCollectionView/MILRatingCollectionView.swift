@@ -8,9 +8,9 @@ import QuartzCore
 
 //// MARK: API ////
 // MARK: Constants
-extension MILRatingCollectionView {
+public extension ____MILRatingCollectionView {
     
-    class Constants {
+    public class Constants {
         
         // MARK: Scrollable View
         /**
@@ -23,8 +23,8 @@ extension MILRatingCollectionView {
         static let DefaultUpperRangeInt: Int = 11
         
         var numberRange: NSRange = NSMakeRange(
-            MILRatingCollectionView.Constants.DefaultLowerRangeInt,
-            MILRatingCollectionView.Constants.DefaultUpperRangeInt
+            ____MILRatingCollectionView.Constants.DefaultLowerRangeInt,
+            ____MILRatingCollectionView.Constants.DefaultUpperRangeInt
         )
         
         // MARK: Color
@@ -69,7 +69,7 @@ extension MILRatingCollectionView {
   * PROGRAMMATICALLY
     * call .currentValue() below
 */
-extension MILRatingCollectionView {
+extension ____MILRatingCollectionView {
     
     func currentValue() -> Int? {
         
@@ -85,10 +85,10 @@ extension MILRatingCollectionView {
 
 
 /** Reusable UIScrollView that acts as a horizontal scrolling number picker */
-class MILRatingCollectionView: UIView {
+public class ____MILRatingCollectionView: UIView {
     
     // MARK: Instance Properties
-    var constants: MILRatingCollectionView.Constants = MILRatingCollectionView.Constants() { didSet { layoutSubviews() } }
+    public var constants: ____MILRatingCollectionView.Constants = ____MILRatingCollectionView.Constants() { didSet { layoutSubviews() } }
     
     private var _scrollView: UIScrollView!
     
@@ -155,7 +155,7 @@ class MILRatingCollectionView: UIView {
     
     // MARK: Instance Methods
     // effectively an init + animation on display
-    override func didMoveToSuperview() {
+    override public func didMoveToSuperview() {
         
         cleanExistingViews()
         createDummyOverlayView()
@@ -168,7 +168,7 @@ class MILRatingCollectionView: UIView {
         
     }
     
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         
         cleanExistingViews()
         didMoveToSuperview()
@@ -347,7 +347,7 @@ class MILRatingCollectionView: UIView {
 }
 
 
-extension MILRatingCollectionView: UIScrollViewDelegate {
+extension ____MILRatingCollectionView: UIScrollViewDelegate {
     
     var centeredX: CGFloat {
         return self.center.x + _scrollView.contentOffset.x
@@ -367,7 +367,7 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
     
     :param: scrollView (should be self)
     */
-    func scrollViewDidScroll(scrollView: UIScrollView) {
+    public func scrollViewDidScroll(scrollView: UIScrollView) {
         
         // done to prevent recalculating / potential errors
         let newCellIndex = self.newCellIndex
@@ -418,7 +418,7 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
     Reference [1]
     Adjusts scrolling to end exactly on an item
     */
-    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    public func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         
         var targetCellViewIndex = floor(targetContentOffset.memory.x / _cellWidth)
         
@@ -441,7 +441,7 @@ private final class RatingCollectionViewCell: UIView {
     
     static let InitErrorString = "Use init(coder aDecoder: NSCoder. constants: MILRatingCollectionView.Constants), NOT init without a constants instance."
     
-    private var constants: MILRatingCollectionView.Constants!
+    private var constants: ____MILRatingCollectionView.Constants!
     
     var number: Int?
     var numberLabel: UILabel!
@@ -455,7 +455,7 @@ private final class RatingCollectionViewCell: UIView {
         
     }
     
-    init(coder aDecoder: NSCoder, constants: MILRatingCollectionView.Constants) {
+    init(coder aDecoder: NSCoder, constants: ____MILRatingCollectionView.Constants) {
         
         super.init(coder: aDecoder)
         
@@ -464,7 +464,7 @@ private final class RatingCollectionViewCell: UIView {
         
     }
     
-    init(frame: CGRect, constants: MILRatingCollectionView.Constants) {
+    init(frame: CGRect, constants: ____MILRatingCollectionView.Constants) {
         
         super.init(frame: frame)
         
