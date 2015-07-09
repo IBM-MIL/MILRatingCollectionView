@@ -5,7 +5,7 @@ Licensed Materials - Property of IBM
 
 import UIKit
 
-class ViewControllerExample: UIViewController {
+class ____MILRatingCollectionViewControllerExample: UIViewController {
     
     override func viewDidLoad() {
         
@@ -17,10 +17,10 @@ class ViewControllerExample: UIViewController {
         let bob = MILUI.RatingCollectionView(frame: bobsFrame)
         
         var bobConstants = MILUI.RatingCollectionView.Constants()
-        bobConstants.fontAnimated = true
-        bobConstants.backgroundColor = UIColor.blueColor()
-        bobConstants.circleBackgroundColor = UIColor.cyanColor()
-        bobConstants.numberRange = NSMakeRange(4, 21)
+            bobConstants.fontAnimated = true
+            bobConstants.backgroundColor = UIColor.blueColor()
+            bobConstants.circleBackgroundColor = UIColor.cyanColor()
+            bobConstants.numberRange = NSMakeRange(4, 21)
         
         bob.constants = bobConstants
         
