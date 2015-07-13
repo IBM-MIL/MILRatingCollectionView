@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2E7DDEF01B432D7800CC8FEB /* MILRatingCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7DDEEF1B432D7800CC8FEB /* MILRatingCollectionView.swift */; };
+		2E82126D1B534B7600AD1547 /* MILRatingCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E82126C1B534B7600AD1547 /* MILRatingCollectionView.swift */; };
 		2E89D12D1A5DC1350088061F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E89D12C1A5DC1350088061F /* AppDelegate.swift */; };
 		2E89D12F1A5DC1350088061F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E89D12E1A5DC1350088061F /* ViewController.swift */; };
 		2E89D1321A5DC1350088061F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E89D1301A5DC1350088061F /* Main.storyboard */; };
@@ -29,7 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2E7DDEEF1B432D7800CC8FEB /* MILRatingCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MILRatingCollectionView.swift; path = MILRatingCollectionView/MILRatingCollectionView.swift; sourceTree = SOURCE_ROOT; };
+		2E82126C1B534B7600AD1547 /* MILRatingCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MILRatingCollectionView.swift; sourceTree = "<group>"; };
 		2E89D1271A5DC1350088061F /* PickerTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PickerTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E89D12B1A5DC1350088061F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E89D12C1A5DC1350088061F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -61,6 +61,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2E82126B1B534B7600AD1547 /* MILRatingCollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				2E82126C1B534B7600AD1547 /* MILRatingCollectionView.swift */,
+			);
+			name = MILRatingCollectionView;
+			path = ../../MILRatingCollectionView;
+			sourceTree = "<group>";
+		};
 		2E89D11E1A5DC1350088061F = {
 			isa = PBXGroup;
 			children = (
@@ -82,7 +91,7 @@
 		2E89D1291A5DC1350088061F /* PickerTest */ = {
 			isa = PBXGroup;
 			children = (
-				2EA456EB1A60A4EF00FA090C /* MILRatingCollectionView */,
+				2E82126B1B534B7600AD1547 /* MILRatingCollectionView */,
 				2E89D12C1A5DC1350088061F /* AppDelegate.swift */,
 				2E89D12E1A5DC1350088061F /* ViewController.swift */,
 				2E89D1301A5DC1350088061F /* Main.storyboard */,
@@ -117,14 +126,6 @@
 				2E89D1411A5DC1350088061F /* Info.plist */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		2EA456EB1A60A4EF00FA090C /* MILRatingCollectionView */ = {
-			isa = PBXGroup;
-			children = (
-				2E7DDEEF1B432D7800CC8FEB /* MILRatingCollectionView.swift */,
-			);
-			path = MILRatingCollectionView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -248,8 +249,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2E89D12F1A5DC1350088061F /* ViewController.swift in Sources */,
-				2E7DDEF01B432D7800CC8FEB /* MILRatingCollectionView.swift in Sources */,
 				2E89D12D1A5DC1350088061F /* AppDelegate.swift in Sources */,
+				2E82126D1B534B7600AD1547 /* MILRatingCollectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
