@@ -149,8 +149,33 @@ final class MILRatingCollectionView: UIView {
         
     }
     
-    var selectedIndex: Int { return _currentlyHighlightedCellIndex }
-    var selectedIndexPath: NSIndexPath? { return NSIndexPath(index: _currentlyHighlightedCellIndex) }
+    /**
+    
+    **STORYBOARD**
+    
+    * give your view an unique .tag and retrieve it via iteration over self.views in the UIViewController. then do (below)
+    
+    **PROGRAMATICALLY**
+    
+    * call .currentValue() below
+    
+    */
+    var selectedIndex: Int? {
+        
+        let cellView: RatingCollectionViewCell? = _cellViews[_currentlyHighlightedCellIndex]
+        return cellView?._numberLabel.text?.toInt()
+    
+    }
+    
+    var selectedIndexPath: NSIndexPath? {
+        
+        if let selectedIndex = self.selectedIndex {
+            return NSIndexPath(index: selectedIndex)
+        } else {
+            return NSIndexPath(index: 0)
+        }
+    
+    }
     
     /** END API */
     
