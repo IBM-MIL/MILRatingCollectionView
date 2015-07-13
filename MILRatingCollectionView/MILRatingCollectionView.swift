@@ -261,7 +261,7 @@ final class MILRatingCollectionView: UIView {
     private func createDummyOverlayView() {
         
         _dummyOverlayView = UIView(frame: _dummyViewFrame)
-        _dummyOverlayView.backgroundColor = UIColor.brownColor()
+        _dummyOverlayView.backgroundColor = UIColor.blueColor()
         _dummyOverlayView.userInteractionEnabled = false
         
         self.addSubview(_dummyOverlayView)
