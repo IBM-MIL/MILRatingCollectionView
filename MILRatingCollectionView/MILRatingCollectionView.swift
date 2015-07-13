@@ -133,8 +133,7 @@ final class MILRatingCollectionView: UIView {
     
     // MARK: Instance Properties
     /** Set this to strictly use a range of integers */
-    private var _numberRange: NSRange! = NSMakeRange(1, 11)       // supporting instance variable, don't touch this
-    var numberRange: NSRange? {                                   // touch this
+    var numberRange: NSRange? {
         
         get {
             return _numberRange
@@ -150,8 +149,13 @@ final class MILRatingCollectionView: UIView {
         
     }
     
+    var selectedIndex: Int { return _currentlyHighlightedCellIndex }
+    var selectedIndexPath: NSIndexPath? { return NSIndexPath(index: _currentlyHighlightedCellIndex) }
+    
     /** END API */
     
+    
+    private var _numberRange: NSRange! = NSMakeRange(1, 11)       // supporting instance variable, don't touch this
     
     private var _scrollView: UIScrollView!
     
