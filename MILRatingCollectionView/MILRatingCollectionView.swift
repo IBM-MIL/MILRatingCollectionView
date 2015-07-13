@@ -78,6 +78,10 @@ extension ____MILRatingCollectionView {
         
     }
     
+    // Old API Support //
+    var selectedIndex: Int? { return currentValue() }
+    var selectedIndexPath: NSIndexPath? { return NSIndexPath(index: self.selectedIndex ?? 0) }
+    
 }
 
 //// MARK: END API ////
