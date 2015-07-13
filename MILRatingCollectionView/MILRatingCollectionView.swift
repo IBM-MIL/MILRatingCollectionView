@@ -167,15 +167,7 @@ final class MILRatingCollectionView: UIView {
     
     }
     
-    var selectedIndexPath: NSIndexPath? {
-        
-        if let selectedIndex = self.selectedIndex {
-            return NSIndexPath(index: selectedIndex)
-        } else {
-            return NSIndexPath(index: 0)
-        }
-    
-    }
+    var selectedIndexPath: NSIndexPath? { return NSIndexPath(index: selectedIndex ?? 0) }
     
     /** END API */
     
