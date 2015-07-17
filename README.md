@@ -2,13 +2,13 @@ MILRatingCollectionView
 =======================
 
 <p align="center">
-<img src="numberPicker.gif"  alt="Drawing" height=400 border=1 /></p>
+<img src="ratingViewCropped.gif"  alt="Drawing" height=250 border=1 /></p>
 
 MILRatingCollectionView is an easy to use, drop-in, reusable UI component built in Swift to display a __horizontal number picker__. It has a customizable number range and font so you can display a beautiful number picker, however you like.
 
 ## Installation
 
-Simple copy `MILRatingCollectionView.swift` into your Xcode project.
+Simply copy `MILRatingCollectionView.swift` into your Xcode project.
 
 
 ## Usage
