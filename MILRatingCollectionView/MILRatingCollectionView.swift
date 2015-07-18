@@ -42,10 +42,19 @@ extension MILRatingCollectionView {
         
         // MARK: Scrollable View
         /**
+        
         number of cells visible at a time in the view
+        
         even values will show one less cell than selected on startup, due to the view being centered on an initial value
+        
+        **NOTE** if you set this value too high and scrolling issues begin to occur, increase the **minCellWidthInPixels** property
+        
         */
-        var numCellsVisible: Int = 5 { didSet { update() } }
+        private var _numCellsVisible: Int = 6
+        var numCellsVisible: Int {
+            get { if _numCellsVisible % 2 == 0 { return _numCellsVisible - 1 } else { return _numCellsVisible } }
+            set { _numCellsVisible = newValue; update() }
+        }
         
         static let DefaultLowerRangeInt: Int = 1
         static let DefaultUpperRangeInt: Int = 11
@@ -60,7 +69,7 @@ extension MILRatingCollectionView {
         // MARK: Sizing
         var circleDiameterToViewHeightRatio = CGFloat(0.6) { didSet { update() } }
         
-        var minCellWidthInPixels = CGFloat(35.0) { didSet { update() } }
+        var minCellWidthInPixels = CGFloat(45.0) { didSet { update() } }
         
         
         // MARK: Fonts (font, size, color)
@@ -189,15 +198,12 @@ private extension MILRatingCollectionView {
     private var centeredX: CGFloat { return self.center.x + _scrollView.contentOffset.x }
     
     private var newCellIndex: Int {
-        
         return Int(
-            
             floor(
-                (self.centeredX - _cellWidth/2) / _cellWidth
+                // this "10.0" helps alleviate flooring inaccuracies and results in more-robust responsiveness
+                (self.centeredX - _cellWidth/2 + CGFloat(10.0)) / _cellWidth
             )
-            
         )
-        
     }
     
     
@@ -234,14 +240,7 @@ private extension MILRatingCollectionView {
         
     }
     
-    var _circleViewDiameter: CGFloat {
-        
-        return max(
-            _size.height * constants.circleDiameterToViewHeightRatio,
-            2 * constants.minCellWidthInPixels
-        )
-        
-    }
+    var _circleViewDiameter: CGFloat { return _size.height * constants.circleDiameterToViewHeightRatio }
     
     private func adjustCircleColor() {
         
@@ -256,8 +255,8 @@ private extension MILRatingCollectionView {
     var _cellWidth: CGFloat {
         
         return max(
-            constants.minCellWidthInPixels,
-            frame.size.width/CGFloat(constants.numCellsVisible)
+            frame.size.width/CGFloat(constants.numCellsVisible),
+            self.constants.minCellWidthInPixels
         )
         
     }
@@ -563,8 +562,8 @@ MARK: UIScrollViewDelegate
         // done to prevent recalculating / potential errors
         let newCellIndex = self.newCellIndex
         
-        let shouldHighlightAnotherCell = _currentlyHighlightedCellIndex != newCellIndex
-        let outOfBoundsScrollingLeft = newCellIndex < 0
+        let shouldHighlightAnotherCell = (_currentlyHighlightedCellIndex != newCellIndex)
+        let outOfBoundsScrollingLeft = (newCellIndex < 0)
         let outOfBoundsScrollingRight = (newCellIndex > _cellViews.count-1)
         
         if shouldHighlightAnotherCell && !outOfBoundsScrollingLeft && !outOfBoundsScrollingRight {
@@ -604,7 +603,7 @@ MARK: UIScrollViewDelegate
     private func scrollToNewScrollLocation(newLocation: CGPoint) {
         
         // overcompensate in scrolling to deal with floor / round inaccuracies
-        let compensationAmount = CGFloat(0.0)
+        let compensationAmount = CGFloat(2.0)
         
         let isScrollingRight = (newLocation.x > _scrollView.contentOffset.x)
         
@@ -649,7 +648,7 @@ extension MILRatingCollectionView {
             
         }
 
-        private func initCell() {
+        func initCell() {
             
             _numberLabel = UILabel(frame: CGRect(origin: CGPointZero, size: self.frame.size))
             _numberLabel.textAlignment = NSTextAlignment.Center
