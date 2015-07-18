@@ -533,6 +533,51 @@ MARK: Checking Current State
 */
 extension MILRatingCollectionView {
     
+    private func isIndexPresent(index: Int) -> (isPresent: Bool, scrollLocation: CGPoint) {
+        
+        var returnTuple: (isPresent: Bool, scrollLocation: CGPoint) = (isPresent: false, scrollLocation: CGPointZero)
+        
+        /**
+        
+        in Swift 2.0, the syntax would be
+        
+            for (index, viewCell) in array.enumerate()
+        
+        whereas in Swift 1.2
+        
+            for (index, viewCell) in enumerate(array)
+        
+        in this case, we'll stick to an "index," but the desire for some syntactic sugar was there. :)
+        
+        */
+        for i in 0 ..< _innerCellViews.count {
+            
+            let ratingCollectionViewCell = _innerCellViews[i]
+            
+            let label = ratingCollectionViewCell._numberLabel
+            
+            if label != nil {
+                
+                if let numberValue = label.text?.toInt() {
+                    
+                    if index == numberValue {
+                        
+                        returnTuple.isPresent = true
+                        returnTuple.scrollLocation = CGPoint(
+                            x: CGFloat(i + _leftCompensationViews.count) * _cellWidth + 0.5 * _cellWidth - _scrollView.center.x,
+                            y: 0.0
+                        )
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+        return returnTuple
+        
     }
     
 }
@@ -595,3 +640,20 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
     called when the currently selected index is programmatically set
     
     */
+    private func scrollToNewScrollLocation(newLocation: CGPoint) {
+        
+        // overcompensate in scrolling to deal with floor / round inaccuracies
+        let compensationAmount = CGFloat(0.0)
+        
+        let isScrollingRight = (newLocation.x > _scrollView.contentOffset.x)
+        
+        var newContentOffset = CGPoint(
+            x: isScrollingRight ? (newLocation.x + compensationAmount) : (newLocation.x - compensationAmount),
+            y: 0.0
+        )
+        
+        _scrollView.setContentOffset(newContentOffset, animated: true)
+        
+    }
+    
+}
