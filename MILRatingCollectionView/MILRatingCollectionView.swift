@@ -7,99 +7,96 @@ import UIKit
 import QuartzCore
 
 
+//numberRange: NSRange
+
 /**
-RatingCollectionViewCell consisting of a number label that varies in size if it is the most centered cell
-NOTE: If changing constants below, don't forget to use "digit.0" to avoid CGFloat / Int calculation issues
+
+MARK: Constants
+
 */
-private final class RatingCollectionViewCell: UIView {
-    
-    struct Constants {
-        
-        static let Font = "Helvetica"
-        
-        static let FontSize: CGFloat = 60
-        
-        static let FontHighlightedAnimationScalingTransform = CGFloat(1.1)
-        
-        static let NormalFontColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0)
-        static let HighlightedFontColor = UIColor.whiteColor()
-        
-        static let AnimationDuration = NSTimeInterval(0.5)
-        
-        // don't touch
-        static var FontUnHighlightedAnimationScalingTransform: CGFloat { return (1 / FontHighlightedAnimationScalingTransform) }
-        
-    }
-    
-    
-    var _numberLabel: UILabel!
-    
-    var unHighlightedFontName: String { return "\(Constants.Font)-Medium" }
-    var highlightedFontName: String { return "\(Constants.Font)-Bold" }
-    
-    
-    required init(coder aDecoder: NSCoder) {
-        
-        super.init(coder: aDecoder)
-        initCell()
-        
-    }
-    
-    override init(frame: CGRect) {
-        
-        super.init(frame: frame)
-        initCell()
-        
-    }
-    
-    private func initCell() {
-        
-        _numberLabel = UILabel(frame: CGRect(origin: CGPointZero, size: self.frame.size))
-        _numberLabel.textAlignment = NSTextAlignment.Center
-        
-        self.addSubview(_numberLabel)
-        self.setAsNormalCell()
-        
-    }
+extension MILRatingCollectionView {
     
     /**
     
-    Method to increase number size and animate with a popping effect
+    MARK: API
     
     */
-    func setAsHighlightedCell() {
+    public class Constants {
         
-        let setAsHighlightedAnimation: () -> () = {
-            
-            let label = self._numberLabel
-            label.textColor = Constants.HighlightedFontColor
-            label.font = UIFont(name: "\(self.highlightedFontName)", size: Constants.FontSize)
-            label.transform = CGAffineTransformScale(label.transform, Constants.FontHighlightedAnimationScalingTransform, Constants.FontHighlightedAnimationScalingTransform)
-            
+        /** Set this to strictly use a range of integers */
+        var numberRange: NSRange? {
+            get { return _parent?._numberRange }
+            set { _parent?._numberRange = newValue }
         }
         
-        UIView.animateWithDuration(Constants.AnimationDuration, animations: setAsHighlightedAnimation)
-        
-    }
-    
-    /**
-    
-    Returns cells back to their original state and smaller size.
-    
-    */
-    func setAsNormalCell() {
-        
-        let setAsUnHighlightedAnimation: () -> () = {
-            
-            let label = self._numberLabel
-            
-            label.textColor = Constants.NormalFontColor
-            label.font = UIFont(name: "\(self.unHighlightedFontName)", size: Constants.FontSize)
-            label.transform = CGAffineTransformScale(label.transform, Constants.FontUnHighlightedAnimationScalingTransform, Constants.FontUnHighlightedAnimationScalingTransform)
-            
+        var selectedIndex: Int? {
+            get { return _parent?._selectedIndex }
+            set { _parent?._selectedIndex = newValue }
         }
         
-        UIView.animateWithDuration(Constants.AnimationDuration, animations: setAsUnHighlightedAnimation)
+        var selectedIndexPath: NSIndexPath? {
+            get { return NSIndexPath(index: selectedIndex ?? 0) }
+            set { selectedIndex = newValue?.indexAtPosition(0) }
+        }
+        
+        
+        // MARK: Scrollable View
+        /**
+        number of cells visible at a time in the view
+        even values will show one less cell than selected on startup, due to the view being centered on an initial value
+        */
+        var numCellsVisible: Int = 5 { didSet { update() } }
+        
+        static let DefaultLowerRangeInt: Int = 1
+        static let DefaultUpperRangeInt: Int = 11
+        
+        
+        // MARK: Color
+        var circleBackgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0) { didSet {  _parent?.adjustCircleColor() } }
+        
+        var backgroundColor = UIColor.lightGrayColor() { didSet { _parent?.adjustBackgroundColor() } }
+        
+        
+        // MARK: Sizing
+        var circleDiameterToViewHeightRatio = CGFloat(0.6) { didSet { update() } }
+        
+        var minCellWidthInPixels = CGFloat(35.0) { didSet { update() } }
+        
+        
+        // MARK: Fonts (font, size, color)
+        var font = "Helvetica" { didSet { update() } }
+        
+        var fontSize: CGFloat = 60 { didSet { update() } }
+        
+        var normalFontColor = UIColor(red: 128/255.0, green: 128/255.0, blue: 128/255.0, alpha: 1.0) { didSet { update() } }
+        
+        var highlightedFontColor = UIColor.whiteColor() { didSet { update() } }
+        
+        /** change this to affect how small / large the fonts become when highlighted and un-highlighted */
+        var fontHighlightedAnimationScalingTransform = CGFloat(1.1) { didSet { update() } }
+        
+        
+        // MARK: Animations
+        var circleAnimated = true
+        var fontAnimated = true { didSet { update() } }
+        
+        var circleAnimationDuration = NSTimeInterval(0.8)
+        var fontAnimationDuration = NSTimeInterval(0.8)
+        
+        /**
+
+        END API
+
+        */
+        
+        // MARK: Don't Touch (please)
+        static let ErrorString = "An error has occurred within the MILRatingCollectionView."
+        var fontUnHighlightedAnimationScalingTransform: CGFloat { return (1 / fontHighlightedAnimationScalingTransform) }
+        
+        init(parent: MILRatingCollectionView!) { _parent = parent }
+        
+        private weak var _parent: MILRatingCollectionView?
+        private func update() {  _parent?.layoutSubviews() }
         
     }
     
@@ -115,113 +112,20 @@ Reusable UIScrollView that acts as a horizontal scrolling number picker
 1. http://www.widecodes.com/7iHmeXqqeU/add-snapto-position-in-a-uitableview-or-uiscrollview.html
 
 */
-final class MILRatingCollectionView: UIView {
+public final class MILRatingCollectionView: UIView {
     
-    /** 
-    
-    MARK: API 
-    
-    */
-    class Constants {
-        
-        /// Movable circle background
-        static let Animated = true
-        static let AnimationDuration = NSTimeInterval(0.8)
-        
-        /// Number of cells visible at a time in the view. Even values will show one less cell than selected on startup, due to the view being centered on an initial value
-        static let NumCellsVisible: Int = 5
-        
-        /// The minimum number of pixels each cell should be. Does not usually need be changed. Only takes effect when the numCellsVisible is set to a value that leaves little room for each cell.
-        static let MinCellWidth: CGFloat = 35
-        
-        /// The size of the circle relative to the size of the view's height
-        static let CircleDiameterToViewHeightRatio: CGFloat = 0.6
-        
-        /// The background color of the circle that surrounds the selected item
-        static let CircleBackgroundColor = UIColor(red: 218.0/255.0, green: 87.0/255.0, blue: 68.0/255.0, alpha: 1.0)
-        
-        // dont touch
-        static let ErrorString = "An error has occurred within the MILRatingCollectionView."
-        static let InitErrorString = "init(coder:) has not been implemented"
-        
+    public var constants: MILRatingCollectionView.Constants! {
+        didSet { layoutSubviews() }
     }
     
+    private var _circularView: UIView!
     
-    /** Set this to strictly use a range of integers */
-    var numberRange: NSRange? {
-        
-        get {
-            return _numberRange
-        }
-        
-        // on set, check if already being displayed before creating redundant text
-        set {
-            
-            _numberRange = newValue
-            layoutSubviews()
-            
-        }
-        
+    private var _numberRange: NSRange! = NSMakeRange(
+        MILRatingCollectionView.Constants.DefaultLowerRangeInt,
+        MILRatingCollectionView.Constants.DefaultUpperRangeInt
+        ) {
+        didSet { layoutSubviews() }
     }
-    
-    /**
-    
-    **STORYBOARD**
-    
-    * give your view an unique .tag and retrieve it via iteration over self.views in the UIViewController. then do (below)
-    
-    **PROGRAMATICALLY**
-    
-    * call .currentValue() below
-    
-    */
-    var selectedIndex: Int? {
-        
-        get {
-            
-            let cellView: RatingCollectionViewCell? = _cellViews[_currentlyHighlightedCellIndex]
-            return cellView?._numberLabel.text?.toInt()
-            
-        }
-        
-        set {
-            
-            let isIndexPresentTuple: (isPresent: Bool, scrollLocation: CGPoint) = isIndexPresent(newValue!)
-            
-            if isIndexPresentTuple.isPresent {
-                
-                scrollToNewScrollLocation(isIndexPresentTuple.scrollLocation)
-                
-            }
-            
-        }
-    
-    }
-    
-    var selectedIndexPath: NSIndexPath? {
-        
-        get {
-            
-            return NSIndexPath(index: selectedIndex ?? 0)
-            
-        }
-        
-        set { selectedIndex = newValue?.indexAtPosition(0) }
-        
-    }
-    
-    /** exposed to support original API */
-    var circularView: UIView!
-    
-    
-    /** 
-    
-    MARK: END API
-    
-    */
-    
-    
-    private var _numberRange: NSRange! = NSMakeRange(1, 11)       // supporting instance variable, don't touch this
     
     private var _scrollView: UIScrollView!
     
@@ -237,6 +141,23 @@ final class MILRatingCollectionView: UIView {
     
     private var _dummyOverlayView: UIView!
     
+    
+    var nilConstants: Bool { return self.constants == nil }
+    
+    override init(frame: CGRect) {
+        
+        super.init(frame: frame)
+        if nilConstants { self.constants = MILRatingCollectionView.Constants(parent: self) }
+        
+    }
+    
+    public required init(coder aDecoder: NSCoder) {
+        
+        super.init(coder: aDecoder)
+        if nilConstants { self.constants = MILRatingCollectionView.Constants(parent: self) }
+        
+    }
+    
 }
 
 
@@ -244,9 +165,9 @@ final class MILRatingCollectionView: UIView {
 
 MARK: Convenience
 
-loose format here of "general to specific" layout & quick calculations
+* Sizes
 
-i.e. frame, then size of inner components, then quick calculations
+* Property Change Handlers
 
 */
 private extension MILRatingCollectionView {
@@ -292,6 +213,14 @@ private extension MILRatingCollectionView {
         
     }
     
+    private func adjustBackgroundColor() {
+        
+        if self._dummyOverlayView != nil {
+            _dummyOverlayView.backgroundColor = self.constants.backgroundColor
+        }
+        
+    }
+    
     
     // MARK: Circle View
     var _circleViewFrame: CGRect {
@@ -299,8 +228,8 @@ private extension MILRatingCollectionView {
         return CGRect(
             x: _size.width/2,
             y: _size.height/2,
-            width: self.circularView.frame.width,
-            height: self.circularView.frame.height
+            width: self._circularView.frame.width,
+            height: self._circularView.frame.height
         )
         
     }
@@ -308,9 +237,17 @@ private extension MILRatingCollectionView {
     var _circleViewDiameter: CGFloat {
         
         return max(
-            _size.height * Constants.CircleDiameterToViewHeightRatio,
-            2*Constants.MinCellWidth
+            _size.height * constants.circleDiameterToViewHeightRatio,
+            2 * constants.minCellWidthInPixels
         )
+        
+    }
+    
+    private func adjustCircleColor() {
+        
+        if self._circularView != nil {
+            _circularView.backgroundColor = self.constants.circleBackgroundColor
+        }
         
     }
     
@@ -319,9 +256,33 @@ private extension MILRatingCollectionView {
     var _cellWidth: CGFloat {
         
         return max(
-            Constants.MinCellWidth,
-            frame.size.width/CGFloat(Constants.NumCellsVisible)
+            constants.minCellWidthInPixels,
+            frame.size.width/CGFloat(constants.numCellsVisible)
         )
+        
+    }
+    
+    private var _selectedIndex: Int? {
+        
+        get {
+            
+            let cellView: RatingCollectionViewCell? = _cellViews[_currentlyHighlightedCellIndex]
+            return cellView?._numberLabel.text?.toInt()
+            
+        }
+        
+        set {
+            
+            /** declares the new type, "isPresentTuple" */
+            typealias isPresentTuple = (isPresent: Bool, scrollLocation: CGPoint)
+            
+            let isIndexPresentTuple: isPresentTuple = isIndexPresent(newValue!)
+            
+            if isIndexPresentTuple.isPresent {
+                scrollToNewScrollLocation(isIndexPresentTuple.scrollLocation)
+            }
+            
+        }
         
     }
     
@@ -337,10 +298,10 @@ rotation, range-setting, constants-changing --> **layoutSubviews()**
 */
 extension MILRatingCollectionView {
     
-    override func layoutSubviews() { didMoveToSuperview() }
+    override public func layoutSubviews() { didMoveToSuperview() }
     
     // effectively an init + animation on display
-    override func didMoveToSuperview() {
+    override public func didMoveToSuperview() {
         
         cleanExistingViews()
         createDummyOverlayView()
@@ -389,14 +350,14 @@ extension MILRatingCollectionView {
             height: _circleViewDiameter
         )
         
-        self.circularView = UIView(frame: temporaryCircularViewFrame)
-        self.circularView.layer.cornerRadius = _circleViewDiameter/2.0
-        self.circularView.backgroundColor = Constants.CircleBackgroundColor
+        _circularView = UIView(frame: temporaryCircularViewFrame)
+        _circularView.layer.cornerRadius = _circleViewDiameter/2.0
+        _circularView.backgroundColor = constants.circleBackgroundColor
         
     }
     
     private func addCircularViewToDummyOverlayView() {
-        _dummyOverlayView.addSubview(self.circularView)
+        _dummyOverlayView.addSubview(self._circularView)
     }
     
     /** sets userInteractionEnabled to 'false' initially, see the method 'configureInitialScrollViewHighlightedIndex()' in 'initView()'  */
@@ -416,11 +377,11 @@ extension MILRatingCollectionView {
         
         let compensationCountLeftRight = Int(
             floor(
-                CGFloat(Constants.NumCellsVisible) / 2.0
+                CGFloat(self.constants.numCellsVisible) / 2.0
             )
         )
         
-        let totalItemsCount = self.numberRange!.length + 2*compensationCountLeftRight
+        let totalItemsCount = self.constants.numberRange!.length + 2 * compensationCountLeftRight
         
         // content size
         _scrollView.contentSize = CGSize(
@@ -436,7 +397,7 @@ extension MILRatingCollectionView {
         var indicesToDrawAsText: [Int] = []
         var rangeIndex = 0
         
-        let range = self.numberRange!
+        let range = self.constants.numberRange!
         for var i = range.location; i < range.location + range.length; i++ {
             
             indicesToDrawAsText.insert(i, atIndex: rangeIndex)
@@ -448,7 +409,7 @@ extension MILRatingCollectionView {
         for var index = 0; index < totalItemsCount; index++ {
             
             let newViewFrame = newScrollViewChildViewFrameWithXOffset(runningXOffset)
-            newViewToAdd = RatingCollectionViewCell(frame: newViewFrame)
+            newViewToAdd = RatingCollectionViewCell(frame: newViewFrame, parent: self)
             
             switch index {
                 
@@ -504,12 +465,12 @@ extension MILRatingCollectionView {
     private func animateCircleToCenter() {
         
         let moveCircleToCenter: () -> () = {
-            self.circularView.center = self._dummyOverlayView.center
+            self._circularView.center = self._dummyOverlayView.center
         }
         
-        if Constants.Animated {
+        if self.constants.circleAnimated {
             
-            UIView.animateWithDuration(Constants.AnimationDuration, animations: moveCircleToCenter) {
+            UIView.animateWithDuration(self.constants.circleAnimationDuration, animations: moveCircleToCenter) {
                 (completed: Bool) in self._scrollView.userInteractionEnabled = true
             }
             
@@ -588,7 +549,7 @@ extension MILRatingCollectionView {
 MARK: UIScrollViewDelegate
 
 */
-extension MILRatingCollectionView: UIScrollViewDelegate {
+ extension MILRatingCollectionView: UIScrollViewDelegate {
     
     /**
     
@@ -597,7 +558,7 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
     :param: scrollView (should be self)
     
     */
-    func scrollViewDidScroll(scrollView: UIScrollView) {
+    public func scrollViewDidScroll(scrollView: UIScrollView) {
         
         // done to prevent recalculating / potential errors
         let newCellIndex = self.newCellIndex
@@ -623,7 +584,7 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
     Adjusts scrolling to end exactly on an item
     
     */
-    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    public func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         
         var targetCellViewIndex = floor(targetContentOffset.memory.x / _cellWidth)
         
@@ -656,4 +617,89 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
         
     }
     
+}
+
+
+/**
+
+RatingCollectionViewCell consisting of a number label that varies in size if it is the most centered cell
+
+NOTE: If changing constants below, don't forget to use "digit.0" to avoid CGFloat / Int calculation issues
+
+*/
+extension MILRatingCollectionView {
+    
+    private final class RatingCollectionViewCell: UIView {
+        
+        var _parentConstants: MILRatingCollectionView.Constants!
+        
+        var _numberLabel: UILabel!
+        
+        var unHighlightedFontName: String { return "\(_parentConstants.font)-Medium" }
+        var highlightedFontName: String { return "\(_parentConstants.font)-Bold" }
+        
+        required init(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
+        
+        init(frame: CGRect, parent: MILRatingCollectionView) {
+            
+            super.init(frame: frame)
+            
+            _parentConstants = parent.constants
+            initCell()
+            
+        }
+
+        private func initCell() {
+            
+            _numberLabel = UILabel(frame: CGRect(origin: CGPointZero, size: self.frame.size))
+            _numberLabel.textAlignment = NSTextAlignment.Center
+            
+            self.addSubview(_numberLabel)
+            self.setAsNormalCell()
+            
+        }
+        
+        /**
+        
+        Method to increase number size and animate with a popping effect
+        
+        */
+        func setAsHighlightedCell() {
+            
+            let setAsHighlightedAnimation: () -> () = {
+                
+                let label = self._numberLabel
+                label.textColor = self._parentConstants.highlightedFontColor
+                label.font = UIFont(name: "\(self.highlightedFontName)", size: self._parentConstants.fontSize)
+                label.transform = CGAffineTransformScale(label.transform, self._parentConstants.fontHighlightedAnimationScalingTransform, self._parentConstants.fontHighlightedAnimationScalingTransform)
+                
+            }
+            
+            UIView.animateWithDuration(_parentConstants.fontAnimationDuration, animations: setAsHighlightedAnimation)
+            
+        }
+        
+        /**
+        
+        Returns cells back to their original state and smaller size.
+        
+        */
+        func setAsNormalCell() {
+            
+            let setAsUnHighlightedAnimation: () -> () = {
+                
+                let label = self._numberLabel
+                
+                label.textColor = self._parentConstants.normalFontColor
+                label.font = UIFont(name: "\(self.unHighlightedFontName)", size: self._parentConstants.fontSize)
+                label.transform = CGAffineTransformScale(label.transform, self._parentConstants.fontUnHighlightedAnimationScalingTransform, self._parentConstants.fontUnHighlightedAnimationScalingTransform)
+                
+            }
+            
+            UIView.animateWithDuration(_parentConstants.fontAnimationDuration, animations: setAsUnHighlightedAnimation)
+            
+        }
+        
+    }
+ 
 }

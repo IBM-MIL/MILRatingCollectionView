@@ -33,23 +33,23 @@ The default range is 0 to 10 if `numberRange` isn't set.
 <table>
   <caption>Property Descriptions</caption>
   <tr>
-    <td><tt>numCellsVisible: CGFloat </tt></td>
+    <td><tt>constants.numCellsVisible: CGFloat </tt></td>
     <td>Number of cells visible at a time in the view. Even values will show one less cell than selected on startup, due to the view being centered on an initial value. Default is 5</td>
   </tr>
   <tr>
-    <td><tt>minCellWidth: CGFloat </tt></td>
+    <td><tt>constants.minCellWidthInPixels: CGFloat </tt></td>
     <td>The minimum number of pixels each cell should be. Does not usually need be changed. Only takes effect when the numCellsVisible is set to a value that leaves little room for each cell. Default is 35</td>
   </tr>
   <tr>
-    <td><tt>circleDiameterToCellWidthRatio: CGFloat </tt></td>
-    <td>The size of the circle relative to the size of the cell. Default is 2.0</td>
+    <td><tt>constants.circleDiameterToViewHeightRatio: CGFloat </tt></td>
+    <td>The diameter of the circle relative to the height of the cell. Default is 0.6</td>
   </tr>
   <tr>
-    <td><tt>circleBackgroundColor: UIColor </tt></td>
+    <td><tt>constants.circleBackgroundColor: UIColor </tt></td>
     <td>The background color of the circle that surrounds the selected item. Default is rgb(218, 87, 68)</td>
   </tr>
   <tr>
-    <td><tt>numberRange: NSRange</tt></td>
+    <td><tt>constants.numberRange: NSRange</tt></td>
     <td>The range of the collectionView, location is the starting number, length is the number of elements. Default is NSMakeRange(0,11)</td>
   </tr>
 </table>
