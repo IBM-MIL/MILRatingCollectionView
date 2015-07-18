@@ -63,7 +63,9 @@ private final class RatingCollectionViewCell: UIView {
     }
     
     /**
+    
     Method to increase number size and animate with a popping effect
+    
     */
     func setAsHighlightedCell() {
         
@@ -81,7 +83,9 @@ private final class RatingCollectionViewCell: UIView {
     }
     
     /**
+    
     Returns cells back to their original state and smaller size.
+    
     */
     func setAsNormalCell() {
         
@@ -102,11 +106,23 @@ private final class RatingCollectionViewCell: UIView {
 }
 
 
-/** Reusable UIScrollView that acts as a horizontal scrolling number picker */
+/** 
+
+Reusable UIScrollView that acts as a horizontal scrolling number picker 
+
+**REFERENCES**
+
+1. http://www.widecodes.com/7iHmeXqqeU/add-snapto-position-in-a-uitableview-or-uiscrollview.html
+
+*/
 final class MILRatingCollectionView: UIView {
     
-    /** API */
     private struct Constants {
+    /** 
+    
+    MARK: API 
+    
+    */
         
         /// Movable circle background
         static let Animated = true
@@ -131,7 +147,6 @@ final class MILRatingCollectionView: UIView {
     }
     
     
-    // MARK: Instance Properties
     /** Set this to strictly use a range of integers */
     var numberRange: NSRange? {
         
@@ -195,7 +210,15 @@ final class MILRatingCollectionView: UIView {
         
     }
     
-    /** END API */
+    /** exposed to support original API */
+    var circularView: UIView!
+    
+    
+    /** 
+    
+    MARK: END API
+    
+    */
     
     
     private var _numberRange: NSRange! = NSMakeRange(1, 11)       // supporting instance variable, don't touch this
@@ -214,20 +237,51 @@ final class MILRatingCollectionView: UIView {
     
     private var _dummyOverlayView: UIView!
     
-    // exposed to support original API
-    var circularView: UIView!
+}
+
+
+/**
+
+MARK: Convenience
+
+loose format here of "general to specific" layout & quick calculations
+
+i.e. frame, then size of inner components, then quick calculations
+
+*/
+private extension MILRatingCollectionView {
     
-    private var _cellWidth: CGFloat {
-        return max(
-            Constants.MinCellWidth,
-            frame.size.width/CGFloat(Constants.NumCellsVisible)
+    // MARK: Overall
+    var _size: CGSize { return self.frame.size }
+    
+    
+    // MARK: Scroll View
+    var _scrollViewFrame: CGRect {
+        
+        return CGRect(
+            origin: CGPointZero,
+            size: _size
         )
+        
     }
     
-    // MARK: convenience calculations
-    private var _size: CGSize { return self.frame.size }
+    private var centeredX: CGFloat { return self.center.x + _scrollView.contentOffset.x }
     
-    private var _dummyViewFrame: CGRect {
+    private var newCellIndex: Int {
+        
+        return Int(
+            
+            floor(
+                (self.centeredX - _cellWidth/2) / _cellWidth
+            )
+            
+        )
+        
+    }
+    
+    
+    // MARK: Dummy View
+    var _dummyViewFrame: CGRect {
         
         return CGRect(
             x: 0.0,
@@ -238,16 +292,9 @@ final class MILRatingCollectionView: UIView {
         
     }
     
-    private var _circleViewDiameter: CGFloat {
-        
-        return max(
-            _size.height * Constants.CircleDiameterToViewHeightRatio,
-            2*Constants.MinCellWidth
-        )
-        
-    }
     
-    private var _circleViewFrame: CGRect {
+    // MARK: Circle View
+    var _circleViewFrame: CGRect {
         
         return CGRect(
             x: _size.width/2,
@@ -258,12 +305,40 @@ final class MILRatingCollectionView: UIView {
         
     }
     
-    private var _scrollViewFrame: CGRect {
-        return CGRect(origin: CGPointZero, size: _size)
+    var _circleViewDiameter: CGFloat {
+        
+        return max(
+            _size.height * Constants.CircleDiameterToViewHeightRatio,
+            2*Constants.MinCellWidth
+        )
+        
     }
     
     
-    // MARK: Instance Methods
+    // MARK: Cells
+    var _cellWidth: CGFloat {
+        
+        return max(
+            Constants.MinCellWidth,
+            frame.size.width/CGFloat(Constants.NumCellsVisible)
+        )
+        
+    }
+    
+}
+
+
+/**
+
+MARK: Setup
+
+rotation, range-setting, constants-changing --> **layoutSubviews()**
+
+*/
+extension MILRatingCollectionView {
+    
+    override func layoutSubviews() { didMoveToSuperview() }
+    
     // effectively an init + animation on display
     override func didMoveToSuperview() {
         
@@ -275,13 +350,6 @@ final class MILRatingCollectionView: UIView {
         configureScrollViewContentSizeAndPopulateScrollView()
         configureInitialScrollViewHighlightedIndex()
         animateCircleToCenter()
-        
-    }
-    
-    override func layoutSubviews() {
-        
-        cleanExistingViews()
-        didMoveToSuperview()
         
     }
     
@@ -458,24 +526,31 @@ final class MILRatingCollectionView: UIView {
 }
 
 
+/**
+
+MARK: Checking Current State
+
+*/
+extension MILRatingCollectionView {
+    
+    }
+    
+}
+
+
+/**
+
+MARK: UIScrollViewDelegate
+
+*/
 extension MILRatingCollectionView: UIScrollViewDelegate {
     
-    var centeredX: CGFloat {
-        return self.center.x + _scrollView.contentOffset.x
-    }
-    
-    var newCellIndex: Int {
-        return Int(
-            floor(
-                (self.centeredX - _cellWidth/2) / _cellWidth
-            )
-        )
-    }
-    
     /**
+    
     Method that recognizes center cell and highlights it while leaving other cells normal
     
     :param: scrollView (should be self)
+    
     */
     func scrollViewDidScroll(scrollView: UIScrollView) {
         
@@ -490,7 +565,6 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
             
             _cellViews[_currentlyHighlightedCellIndex].setAsNormalCell()
             _cellViews[newCellIndex].setAsHighlightedCell()
-            
             _currentlyHighlightedCellIndex = newCellIndex
             
         }
@@ -498,8 +572,11 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
     }
     
     /**
+    
     Reference [1]
+    
     Adjusts scrolling to end exactly on an item
+    
     */
     func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         
@@ -513,7 +590,8 @@ extension MILRatingCollectionView: UIScrollViewDelegate {
         
     }
     
-}
+    /**
 
-/** REFERENCES */
-// [1] http://www.widecodes.com/7iHmeXqqeU/add-snapto-position-in-a-uitableview-or-uiscrollview.html
+    called when the currently selected index is programmatically set
+    
+    */
