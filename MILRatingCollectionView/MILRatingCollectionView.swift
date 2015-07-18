@@ -162,12 +162,38 @@ final class MILRatingCollectionView: UIView {
     */
     var selectedIndex: Int? {
         
-        let cellView: RatingCollectionViewCell? = _cellViews[_currentlyHighlightedCellIndex]
-        return cellView?._numberLabel.text?.toInt()
+        get {
+            
+            let cellView: RatingCollectionViewCell? = _cellViews[_currentlyHighlightedCellIndex]
+            return cellView?._numberLabel.text?.toInt()
+            
+        }
+        
+        set {
+            
+            let isIndexPresentTuple: (isPresent: Bool, scrollLocation: CGPoint) = isIndexPresent(newValue!)
+            
+            if isIndexPresentTuple.isPresent {
+                
+                scrollToNewScrollLocation(isIndexPresentTuple.scrollLocation)
+                
+            }
+            
+        }
     
     }
     
-    var selectedIndexPath: NSIndexPath? { return NSIndexPath(index: selectedIndex ?? 0) }
+    var selectedIndexPath: NSIndexPath? {
+        
+        get {
+            
+            return NSIndexPath(index: selectedIndex ?? 0)
+            
+        }
+        
+        set { selectedIndex = newValue?.indexAtPosition(0) }
+        
+    }
     
     /** END API */
     
