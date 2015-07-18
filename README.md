@@ -38,7 +38,7 @@ The default range is 0 to 10 if `numberRange` isn't set.
   </tr>
   <tr>
     <td><tt>constants.minCellWidthInPixels: CGFloat </tt></td>
-    <td>The minimum number of pixels each cell should be. Does not usually need be changed. Only takes effect when the numCellsVisible is set to a value that leaves little room for each cell. Default is 35</td>
+    <td>The minimum number of pixels each cell should be. Does not usually need be changed. Only takes effect when the numCellsVisible is set to a value that leaves little room for each cell. Default is 45</td>
   </tr>
   <tr>
     <td><tt>constants.circleDiameterToViewHeightRatio: CGFloat </tt></td>

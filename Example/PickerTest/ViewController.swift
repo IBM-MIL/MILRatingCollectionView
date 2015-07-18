@@ -29,7 +29,6 @@ class ViewController: UIViewController {
         
         super.viewDidLoad()
         
-        mil?.constants.selectedIndex = 7
         mil?.constants.normalFontColor = UIColor.blackColor()
         
     }
@@ -77,7 +76,7 @@ class ViewController: UIViewController {
             if numVisibleToggled {
                 mil!.constants.numCellsVisible = oldNumVisible
             } else {
-                mil!.constants.numCellsVisible = 12
+                mil!.constants.numCellsVisible = 3
             }
             
             numVisibleToggled = !numVisibleToggled
