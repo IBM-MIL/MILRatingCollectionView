@@ -117,12 +117,12 @@ Reusable UIScrollView that acts as a horizontal scrolling number picker
 */
 final class MILRatingCollectionView: UIView {
     
-    private struct Constants {
     /** 
     
     MARK: API 
     
     */
+    class Constants {
         
         /// Movable circle background
         static let Animated = true
