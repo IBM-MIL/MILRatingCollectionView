@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -16,42 +17,77 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Pjf-fp-ZFs" customClass="MILRatingCollectionView" customModule="PickerTest" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="20" width="320" height="190"/>
-                                <color key="backgroundColor" red="0.92522013121546964" green="0.92496545575612454" blue="0.91098467666654048" alpha="1" colorSpace="calibratedRGB"/>
+                            <view tag="999" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Uo1-Po-Z7k" customClass="MILRatingCollectionView" customModule="PickerTest" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="20" width="320" height="200"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="190" id="OWH-Wy-OzO"/>
+                                    <constraint firstAttribute="height" constant="200" id="7Ys-Is-dfz"/>
                                 </constraints>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="2jv-7w-mIN">
-                                    <size key="itemSize" width="50" height="50"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="numberCell" id="nNJ-uH-ftF">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </view>
-                                    </collectionViewCell>
-                                </cells>
-                            </collectionView>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kpj-bh-eN1">
+                                <rect key="frame" x="16" y="228" width="72" height="30"/>
+                                <state key="normal" title="Scroll To 1">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="scrollTo1" destination="BYZ-38-t0r" eventType="touchUpInside" id="scZ-Cs-hnM"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4s6-zF-eIy">
+                                <rect key="frame" x="16" y="266" width="72" height="30"/>
+                                <state key="normal" title="Scroll To 9">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="scrollTo9" destination="BYZ-38-t0r" eventType="touchUpInside" id="VCW-ra-VV4"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FHw-PJ-xKq">
+                                <rect key="frame" x="16" y="304" width="170" height="30"/>
+                                <state key="normal" title="toggle circle background">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="toggleCircleBackground" destination="BYZ-38-t0r" eventType="touchUpInside" id="kOP-LU-HpX"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YWg-mg-hYl">
+                                <rect key="frame" x="16" y="342" width="129" height="30"/>
+                                <state key="normal" title="toggle background">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="toggleBackground" destination="BYZ-38-t0r" eventType="touchUpInside" id="tVb-br-Kve"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J5K-pM-Utf">
+                                <rect key="frame" x="16" y="380" width="125" height="30"/>
+                                <state key="normal" title="toggle num visible">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="toggleNumVisible" destination="BYZ-38-t0r" eventType="touchUpInside" id="kkI-wg-el3"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="width" secondItem="Pjf-fp-ZFs" secondAttribute="width" id="3XC-9D-aRt"/>
-                            <constraint firstAttribute="centerX" secondItem="Pjf-fp-ZFs" secondAttribute="centerX" id="UKD-Gx-x1d"/>
-                            <constraint firstItem="Pjf-fp-ZFs" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="uxK-hV-f5V"/>
+                            <constraint firstItem="4s6-zF-eIy" firstAttribute="top" secondItem="kpj-bh-eN1" secondAttribute="bottom" constant="8" id="1GF-dq-6Zm"/>
+                            <constraint firstItem="YWg-mg-hYl" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="1HB-5V-K4p"/>
+                            <constraint firstItem="J5K-pM-Utf" firstAttribute="top" secondItem="YWg-mg-hYl" secondAttribute="bottom" constant="8" symbolic="YES" id="7Sx-08-cd9"/>
+                            <constraint firstItem="4s6-zF-eIy" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="92a-bY-lLb"/>
+                            <constraint firstItem="Uo1-Po-Z7k" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-16" id="Meg-ar-Gmk"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Uo1-Po-Z7k" secondAttribute="trailing" constant="-16" id="chj-Yn-8dk"/>
+                            <constraint firstItem="YWg-mg-hYl" firstAttribute="top" secondItem="FHw-PJ-xKq" secondAttribute="bottom" constant="8" id="drO-er-JxJ"/>
+                            <constraint firstItem="Uo1-Po-Z7k" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="dzk-3S-Y95"/>
+                            <constraint firstItem="kpj-bh-eN1" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="mxd-V2-aVr"/>
+                            <constraint firstItem="kpj-bh-eN1" firstAttribute="top" secondItem="Uo1-Po-Z7k" secondAttribute="bottom" constant="8" id="omZ-Ht-H6a"/>
+                            <constraint firstItem="J5K-pM-Utf" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="qUw-NQ-nG0"/>
+                            <constraint firstItem="FHw-PJ-xKq" firstAttribute="top" secondItem="4s6-zF-eIy" secondAttribute="bottom" constant="8" id="rN4-Ss-WTT"/>
+                            <constraint firstItem="FHw-PJ-xKq" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="ry7-yA-Rgv"/>
                         </constraints>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
-                    <connections>
-                        <outlet property="milRatingCollectionView" destination="Pjf-fp-ZFs" id="DzR-JS-5Xz"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
